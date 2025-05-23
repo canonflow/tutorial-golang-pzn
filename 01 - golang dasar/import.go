@@ -11,5 +11,9 @@ func main() {
 	- Jika kita ingin mengakses file golang yg berada diluar package, maka kita bisa menggunakan Import
 	*/
 	result := helper.SayHello("Nathan")
-	fmt.Println(result) // Hello Nathan
+	fmt.Println(result)             // Hello Nathan
+	fmt.Println(helper.Application) // golang
+	//fmt.Println(helper.version)              // gk isa
+	//fmt.Println(helper.sayGoodBye("Nathan")) // gk isa
+	helper.Contoh()
 }
