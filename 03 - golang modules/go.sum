@@ -1,2 +1,4 @@
 github.com/canonflow/golang-pzn-modules v1.0.0 h1:QeRbT0etifvdWe62eOq1beHlSnngNsDXjPTgzLHa9ZI=
 github.com/canonflow/golang-pzn-modules v1.0.0/go.mod h1:/NMgZAtzX4hCmRRJlUAE2V/j/3Mk5lk4j94UujWyYdM=
+github.com/canonflow/golang-pzn-modules v1.5.0 h1:VJwcF5dlajJ8ugC+GJzXLODKNna4KjD0s9qdQz8USM4=
+github.com/canonflow/golang-pzn-modules v1.5.0/go.mod h1:/NMgZAtzX4hCmRRJlUAE2V/j/3Mk5lk4j94UujWyYdM=

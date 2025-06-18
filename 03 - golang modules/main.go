@@ -6,5 +6,5 @@ import (
 )
 
 func main() {
-	fmt.Println(golang_pzn_modules.SayHello()) // Hello
+	fmt.Println(golang_pzn_modules.SayHello()) // Hello World
 }
