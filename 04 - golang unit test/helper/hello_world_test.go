@@ -1,6 +1,9 @@
 package helper
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 /* ===== POLICIES =====
 -- FILE TEST --
@@ -19,18 +22,38 @@ import "testing"
 - go test./...: menjalankan semua unit test dari TOP FOLDER module-nya
 */
 
-func TestHelloWorld(t *testing.T) {
+/*
+- t.Fail(): menggagalkan unit test, namun tetap MELANJUTKAN eksekusi unit test. Namun di akhir ketika selesai,
+			maka unit test tersebut dianggap gagal
+- t.FailNow():menggagalkan unit test saat ini juga, TANPA MELANJUTKAN eksekusi unit test
+- t.Error(args...): melakukan log (print) error, namun setelah melakukan log error, dia akan secara otomatis
+					memanggil t.Fail(), artinya eksekusi unit test akan tetap dijalankan sampai selesai
+- t.Fatal(args...): mirip dengan t.Error(), hanya saja setelah melakukan log error, dia akan memanggil
+					t.FailNow(), sehingga mengakibatkan eksekusi unit test berhenti
+*/
+
+func TestHelloWorldNathan(t *testing.T) {
 	result := HelloWorld("Nathan")
 	if result != "Hello Nathan!" {
 		// Unit test failed
-		panic("Result is not 'Hello Nathan!'")
+		//panic("Result is not 'Hello Nathan!'")
+		//t.Fail()
+		t.Error("Result must be 'Hello Nathan!', got: " + result)
 	}
+
+	// Tetap dijalankan
+	fmt.Println("===== TestHelloWorldNathan DONE =====")
 }
 
 func TestHelloWorldGarzya(t *testing.T) {
 	result := HelloWorld("Garzya")
 	if result != "Hello Garzya!" {
 		// Unit test failed
-		panic("Result is not 'Hello Garzya!'")
+		//panic("Result is not 'Hello Garzya!'")
+		//t.FailNow()
+		t.Fatal("Result must be 'Hello Garzya!', got: " + result)
 	}
+
+	// Tidak akan dijalankan
+	fmt.Println("===== TestHelloWorld DONE =====")
 }
