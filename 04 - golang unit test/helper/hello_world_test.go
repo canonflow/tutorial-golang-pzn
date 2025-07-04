@@ -2,6 +2,8 @@ package helper
 
 import (
 	"fmt"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"testing"
 )
 
@@ -31,6 +33,23 @@ import (
 - t.Fatal(args...): mirip dengan t.Error(), hanya saja setelah melakukan log error, dia akan memanggil
 					t.FailNow(), sehingga mengakibatkan eksekusi unit test berhenti
 */
+
+/* ===== ASSERTION =====
+- assert: Jika gagal, menggunakan t.Fail()
+- require: Jika gagal, menggunakan t.FailNow()
+*/
+
+func TestHelloWorldAssert(t *testing.T) {
+	result := HelloWorld("Nathan")
+	assert.Equal(t, "Hello Nathan!", result, "Result must be 'Hello Nathan!'")
+	fmt.Println("===== TestHelloWorldAssert DONE =====")
+}
+
+func TestHelloWorldRequire(t *testing.T) {
+	result := HelloWorld("Nathan")
+	require.Equal(t, "Hello Nathan!", result, "Result must be 'Hello Nathan!'")
+	fmt.Println("===== TestHelloWorldRequire DONE =====")
+}
 
 func TestHelloWorldNathan(t *testing.T) {
 	result := HelloWorld("Nathan")
