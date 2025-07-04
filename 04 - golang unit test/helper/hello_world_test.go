@@ -41,6 +41,25 @@ import (
 - require: Jika gagal, menggunakan t.FailNow()
 */
 
+/*
+	===== BEFORE AFTER TEST =====
+  - Jika terdapat function bernama TestMain, golang akan mengeksekusi function ini tiap kali akan menjalankan
+    test di sebuah package
+  - Dengan ini kita bisa mengatur Before dan After unit test sesuai dengan yang kita mau
+
+-Ingat, function TestMain itu dieksekusi hanya sekali per Golang package, bukan per tiap function unit test
+*/
+
+func TestMain(m *testing.M) {
+	// Before
+	fmt.Println("===== BEFORE UNIT TEST =====")
+
+	m.Run()
+
+	// After (tetap dijalankan walaupun ada unit test yang fail (FailNow, require)
+	fmt.Println("===== AFTER UNIT TEST =====")
+}
+
 func TestSkip(t *testing.T) {
 	if runtime.GOOS == "darwin" {
 		t.Skip("Can't run on Mac OS")
