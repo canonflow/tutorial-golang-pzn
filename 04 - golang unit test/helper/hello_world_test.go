@@ -53,8 +53,37 @@ import (
 /* ===== SUB TEST =====
 - go test -run TestNamaFunction/NamaSubTest: menjalankan hanya salah satu sub test
 - go test -run /NamaSubTest: menjalankan semua test dengan semua sub test di semua function
-
 */
+
+/* ===== BENCHMARK =====
+- go test -v -bench . : Menjalankan seluruh benchmark di module
+- go test -v -run=NotMathUnitTest -bench . : Menjalankan benchmark tanpa unit test
+	-> menjalankan function unit test yg tidak ada (dgn kata lain, tidak ada unit test yg dijalankan)
+- go test -v -run=NotMatchUnitTest -bench=BenchamarkTest : Menjalankan tanpa unit test dengan benchmark tertentu
+- go test -v -bench ../...
+
+----- CONTOH OUTPUT -----
+goos: windows
+goarch: amd64
+pkg: golang-unit-test/helper
+cpu: AMD Ryzen 7 5800H with Radeon Graphics
+BenchmarkHelloWorld
+BenchmarkHelloWorld-16                  72040485                16.79 ns/op
+BenchmarkHelloWorldGarzya
+BenchmarkHelloWorldGarzya-16            71042908                16.48 ns/op
+*/
+
+func BenchmarkHelloWorld(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		HelloWorld("Nathan")
+	}
+}
+
+func BenchmarkHelloWorldGarzya(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		HelloWorld("Garzya")
+	}
+}
 
 func TestHelloWorldTable(t *testing.T) {
 	tests := []struct {
