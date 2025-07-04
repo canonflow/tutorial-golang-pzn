@@ -74,6 +74,41 @@ BenchmarkHelloWorldGarzya
 BenchmarkHelloWorldGarzya-16            71042908                16.48 ns/op
 */
 
+func BenchmarkHelloWorldTable(b *testing.B) {
+	benchmarks := []struct {
+		name    string
+		request string
+	}{
+		{
+			name:    "HelloWorld(Nathan)",
+			request: "Nathan",
+		},
+		{
+			name:    "HelloWorld(Garzya)",
+			request: "Garzya",
+		},
+	}
+
+	for _, benchmark := range benchmarks {
+		b.Run(benchmark.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				HelloWorld(benchmark.request)
+			}
+		})
+	}
+	/*
+		goos: windows
+		goarch: amd64
+		pkg: golang-unit-test/helper
+		cpu: AMD Ryzen 7 5800H with Radeon Graphics
+		BenchmarkHelloWorldTable
+		BenchmarkHelloWorldTable/HelloWorld(Nathan)
+		BenchmarkHelloWorldTable/HelloWorld(Nathan)-16          70564574                16.96 ns/op
+		BenchmarkHelloWorldTable/HelloWorld(Garzya)
+		BenchmarkHelloWorldTable/HelloWorld(Garzya)-16          70472576                16.85 ns/op
+	*/
+}
+
 func BenchmarkSub(b *testing.B) {
 	b.Run("Nathan", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
