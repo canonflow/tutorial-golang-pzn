@@ -50,6 +50,25 @@ import (
 -Ingat, function TestMain itu dieksekusi hanya sekali per Golang package, bukan per tiap function unit test
 */
 
+/* ===== SUB TEST =====
+- go test -run TestNamaFunction/NamaSubTest: menjalankan hanya salah satu sub test
+- go test -run /NamaSubTest: menjalankan semua test dengan semua sub test di semua function
+
+*/
+
+func TestSubTest(t *testing.T) {
+	t.Run("Nathan", func(t *testing.T) {
+		result := HelloWorld("Nathan")
+		assert.Equal(t, "Hello Nathan!", result, "Result must be 'Hello Nathan!'")
+	})
+
+	t.Run("Garzya", func(t *testing.T) {
+		result := HelloWorld("Garzya")
+		assert.Equal(t, "Hello Garzya!", result, "Result must be 'Hello Garzya!'")
+	})
+
+}
+
 func TestMain(m *testing.M) {
 	// Before
 	fmt.Println("===== BEFORE UNIT TEST =====")
