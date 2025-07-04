@@ -61,6 +61,7 @@ import (
 	-> menjalankan function unit test yg tidak ada (dgn kata lain, tidak ada unit test yg dijalankan)
 - go test -v -run=NotMatchUnitTest -bench=BenchamarkTest : Menjalankan tanpa unit test dengan benchmark tertentu
 - go test -v -bench ../...
+- go test -v -bench BenchmarkSub/NamaSubBenchmark: Menjalankan sub benchmark
 
 ----- CONTOH OUTPUT -----
 goos: windows
@@ -72,6 +73,31 @@ BenchmarkHelloWorld-16                  72040485                16.79 ns/op
 BenchmarkHelloWorldGarzya
 BenchmarkHelloWorldGarzya-16            71042908                16.48 ns/op
 */
+
+func BenchmarkSub(b *testing.B) {
+	b.Run("Nathan", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			HelloWorld("Nathan")
+		}
+	})
+
+	b.Run("Garzya", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			HelloWorld("Garzya")
+		}
+	})
+	/*
+		goos: windows
+		goarch: amd64
+		pkg: golang-unit-test/helper
+		cpu: AMD Ryzen 7 5800H with Radeon Graphics
+		BenchmarkSub
+		BenchmarkSub/Nathan
+		BenchmarkSub/Nathan-16          72196518                16.91 ns/op
+		BenchmarkSub/Garzya
+		BenchmarkSub/Garzya-16          71773768                16.73 ns/op
+	*/
+}
 
 func BenchmarkHelloWorld(b *testing.B) {
 	for i := 0; i < b.N; i++ {
