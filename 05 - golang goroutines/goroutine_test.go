@@ -10,6 +10,10 @@ func RunHelloWorld() {
 	fmt.Println("Hello World")
 }
 
+func DisplayNumber(number int) {
+	fmt.Println("Display Number:", number)
+}
+
 func TestCreateGoroutine(t *testing.T) {
 	go RunHelloWorld()
 	fmt.Println("Ups ...")
@@ -25,4 +29,12 @@ func TestCreateGoroutine(t *testing.T) {
 		PASS
 		ok      golang-goroutines       1.136s
 	*/
+}
+
+func TestManyGoroutine(t *testing.T) {
+	for i := range 100000 {
+		go DisplayNumber(i)
+	}
+
+	time.Sleep(7 * time.Second)
 }
