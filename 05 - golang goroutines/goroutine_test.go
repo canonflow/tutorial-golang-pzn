@@ -1,0 +1,28 @@
+package main
+
+import (
+	"fmt"
+	"testing"
+	"time"
+)
+
+func RunHelloWorld() {
+	fmt.Println("Hello World")
+}
+
+func TestCreateGoroutine(t *testing.T) {
+	go RunHelloWorld()
+	fmt.Println("Ups ...")
+
+	// Just in case biar goroutine-nya sudah selesai sebelum aplikasi-nya selesai
+	time.Sleep(1 * time.Second)
+
+	/*
+		=== RUN   TestCreateGoroutine
+		Ups ...
+		Hello World
+		--- PASS: TestCreateGoroutine (1.00s)
+		PASS
+		ok      golang-goroutines       1.136s
+	*/
+}
