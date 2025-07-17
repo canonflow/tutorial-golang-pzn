@@ -7,7 +7,6 @@ import (
 )
 
 func TestEmpty(t *testing.T) {
-
 }
 
 func TestOpenConnection(t *testing.T) {
