@@ -15,4 +15,11 @@
 ## Embed File ke String
 - Embed file bisa kita lakukan ke variable dengan tipe data string.
 - Secara **otomatis**, isi file akan **dibaca sbg text** dan **dimasukkan** ke variable tsb.
-- 
+
+---
+
+## Embed File ke []byte
+- Selain ke tipe data String, embed file juga dapat dilakukan ke variable tipe data `[]byte`.
+- Ini **cocok** sekali jika kita ingin melakukan embed file dalam **bentuk binary**, seperti **gambar** dan lain - lain.
+
+
