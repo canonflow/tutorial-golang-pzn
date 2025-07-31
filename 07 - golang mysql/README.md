@@ -128,3 +128,20 @@ query_insert := "INSERT INTO user(username, password) VALUES(?, ?);"
 - Untuk memulai transaksi, kita bisa menggunakan function `(DB) Begin()`, dimana akan menghasilkan struct `Tx` yang merupakan **representasi Transaction**.
 - Struct `Tx` ini **yang kita gunakan sebagai pengganti DB** untuk melakukan transaksi, dimana hampir semua function di `DB` ada di `Tx`, seperti `Exec`, `Query`, atau `Prepare`.
 - Setelah selesai proses transaksi, kita bisa gunakan function `(Tx) Commit()` untuk melakukan **commit** atau `(Tx) Rollback()` untuk melakukan **rollback**.
+
+---
+
+## Repository Pattern
+- Di dalam buku **Domain-Driven Design, Eric Evans** menjelaskan bahwa:
+> "repository is a mechanism for encapsulating storage, retrieval, and search behavior, which emulates a collection of objects."
+- Pattern Repository ini biasanya digunakan sebagai jembatan antara **business logic** aplikasi kita dengan **semua perintah SQL** ke database.
+- Jadi semua perintah SQL akan **ditulis di Repository**, sedangkan business logic kode program kita hanya cukup menggunakan Repository tersebut.
+
+### Diagram
+![Digram Reposistory Pattern](./assets/1.png)
+
+### Entity / Model
+- Dalam OOP, biasanya sebuah tabel di database akan selalu dibuat representasinya sebagai **class Entity / Model**, namun di Golang, karena tidak mengenal `Class`, jadi kita akan representasikan data dalam bentuk `struct`.
+- Ini bisa mempermudah ketika membuat kode program.
+- Misal ketika kita query ke Repository, **dibanding mengembalikan array**, alangkah baiknya **Repository melakukan konversi** terlebih dahulu ke **struct Entity / Model**, sehingga kita **tinggal menggunakan objectnya** saja.
+
