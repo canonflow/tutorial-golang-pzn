@@ -28,4 +28,13 @@
 - Kadang ada kebutuhan kita ingin melakukan embed beberapa file sekaligus.
 - Hal ini juga bisa dilakukan menggunakan embed package.
 - Kita bisa menambahkan komentar `//go:embed` lebih dari 1 baris.
-- Selain itu variable-nya bisa kita gunakan tipe data `embed.FS`
+- Selain itu variable-nya bisa kita gunakan tipe data `embed.FS`.
+
+---
+
+## Path Matcher
+- Selain manual 1 per 1, kita bisa menggunakan Path Matcher untul membaca multiple file yg kita inginkan.
+- Ini sangat cocok ketika misal kita punya **pola jenis file** yang **kita inginkan** untuk dibaca.
+- Caranya, kita perlu menggunakan path matcher seperti pada package function `path.Match`.
+
+
