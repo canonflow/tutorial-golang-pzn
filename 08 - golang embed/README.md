@@ -37,4 +37,11 @@
 - Ini sangat cocok ketika misal kita punya **pola jenis file** yang **kita inginkan** untuk dibaca.
 - Caranya, kita perlu menggunakan path matcher seperti pada package function `path.Match`.
 
+---
+
+## Hasil Embed di Compile
+- Perlu diketahui, bahwa hasil embed yg dilakukan oleh package embed adalah **permanent** dan data file yang dibaca **disimpan dalam binary file Golang-nya**.
+- Artinya **bukan dilakukan secara realtime** membaca file yg ada di luar.
+- Hal ini menjadikan jika **binary file Golang sudah dicompile**, kita **tidak butuh lagi file external-nya**. Dan bahkan jika **diubah file external-nya**, **isi variable tidak akan berubah lagi**.
+
 
