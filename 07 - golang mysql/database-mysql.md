@@ -73,3 +73,12 @@ panic: sql: Scan error on column index 2, name "email": converting NULL to strin
 | int32 | database/sql.NullInt32 |
 | int64 | database/sql.NullInt64 |
 | time.Time | database/sql.NullTime |
+
+---
+
+## SQL Injection
+- Saat kita membuat aplikasi, kita tidak mungkin akan melakukan hardcode perintah SQL di kode Golang kita.
+- Biasanya kita akan menggunakan input dari user, lalu membuat perintah SQL dari input user, dan mengirimnya menggunakan perintah SQL.
+- SQL Injection adalah sebuah teknik yg menyalahgunakan sebuah celah keamanan yg terjadi dalam lapisan database sebuah aplikasi.
+- Biasanya, SQL Injection dilakukan dengan mengirimkan input dari user dengan perintah yang salah, sehingga menyebabkan hasil SQL yang kita buat menjadi tidak valid.
+- SQL Injection sangat berbahaya, jika sampai kita salah membuat SQL, bisa jadi data kita tidak aman.
