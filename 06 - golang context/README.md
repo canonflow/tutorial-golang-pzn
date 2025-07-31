@@ -78,3 +78,16 @@ type Context interface {
 - Biasanya proses ini berupa **Goroutine yang berbeda**, sehingga dengan **mudah** jika kita **ingin membatalkan eksekusi Goroutine**, kita bisa **mengirim sinyal cancel** ke **context-nya**.
 - Namun ingat, **Goroutine yang menggunakan context**, tetap harus **melakukan pengecekan terhadap context-nya**, jika tidak tidak ada gunanya.
 - Untuk membuat context dengna cancel sinyal, kita bisa menggunakan function `context.WithCancel(parent)`.
+
+---
+
+## Context with Timeout
+- Kita bisa menambahkan sinyal cancel ke context **secara otomatis** dengan menggunakan pengaturan **timeout**.
+- Dengan menggunakan pengaturan timeout, kita **tidak perlu** melakukan eksekusi **cancel secara manual**, cancel **secara otomatis** di eksekusi **jika waktu timeout sudah terlewati**.
+- Penggunaan context dengan timeout sangat cocok ketiak misal kita melakukan query ke databases atau HTTP API, namin ingin menentukan batas maksimal timeout-nya.
+- Untuk membuat context dengan **cancel signal secara otomatis menggunakan timeout**, kita bisa menggunakan function `context.WithTimeout(parent, duration)`.
+
+---
+
+## Context with Deadline
+- 
