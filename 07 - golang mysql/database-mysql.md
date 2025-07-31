@@ -95,3 +95,13 @@ query_select := "SELECT username FROM user WHERE username = ? AND password = ? L
 query_insert := "INSERT INTO user(username, password) VALUES(?, ?);"
 ```
 
+---
+
+## Auto Increment
+- Kadang kita membuat sebuah table dengan **ID auto increment**.
+- Dan kadang pula, kita ingin mengambil data ID yang sudah kita insert ke dalam MySQL.
+- Sebenarnya, kita bisa melakukan query ulang ke database menggunakan `SELECt LAST_INSERT_ID()`
+- Tapi untungnya di Golang ada cara yang lebih mudah.
+- Kita bisa menggunakan function `(Result) LastInsertId()` untuk mendapatkan ID terakhir yang dibuat secara **auto increment**
+- Result adalah **object yang dikembalikan** ketika kita menggunakan function `Exec()`.
+
