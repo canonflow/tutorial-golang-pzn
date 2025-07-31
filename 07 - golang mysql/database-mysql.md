@@ -118,3 +118,13 @@ query_insert := "INSERT INTO user(username, password) VALUES(?, ?);"
 - Untuk membuat Prepare Statement, kita bisa menggunakan function `(DB) Prepare(context, sql)`
 - Prepare Statement direpresentasikan dalam struct `database/sql.Stmt`
 - Sama seperti resource sql lainnya, Stmt **HARUS** di `Close()` jika sudah tidak digunakan lagi.
+
+---
+
+## Database Transaction
+- Salah satu fitur andalan di database adalah **Transaction**
+- Secara default, semua perintah **SQL yang kita kirim** menggunakan Golang akan **otomatis dicommit**, atau istilahnya **auto commit**.
+- Namun, kita bisa menggunakan **fitur transaksi** sehingga SQL yang kita kirim **tidak secara otomatis dicommit** ke database.
+- Untuk memulai transaksi, kita bisa menggunakan function `(DB) Begin()`, dimana akan menghasilkan struct `Tx` yang merupakan **representasi Transaction**.
+- Struct `Tx` ini **yang kita gunakan sebagai pengganti DB** untuk melakukan transaksi, dimana hampir semua function di `DB` ada di `Tx`, seperti `Exec`, `Query`, atau `Prepare`.
+- Setelah selesai proses transaksi, kita bisa gunakan function `(Tx) Commit()` untuk melakukan **commit** atau `(Tx) Rollback()` untuk melakukan **rollback**.
