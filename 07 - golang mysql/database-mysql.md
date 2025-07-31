@@ -82,3 +82,16 @@ panic: sql: Scan error on column index 2, name "email": converting NULL to strin
 - SQL Injection adalah sebuah teknik yg menyalahgunakan sebuah celah keamanan yg terjadi dalam lapisan database sebuah aplikasi.
 - Biasanya, SQL Injection dilakukan dengan mengirimkan input dari user dengan perintah yang salah, sehingga menyebabkan hasil SQL yang kita buat menjadi tidak valid.
 - SQL Injection sangat berbahaya, jika sampai kita salah membuat SQL, bisa jadi data kita tidak aman.
+
+---
+
+## SQL dengan Parameter
+- Function `Exec()` dan `Query()` sebenarnya memiliki parameter tambahan yang bisa kita gunakan untuk **mensubtitusi parameter** dari function tersebut ke SQL query yang kita buat.
+- Untuk menandai sebuah SQL membutuhkan parameter, kita bisa gunakan karakter `?` (**tanda tanya**).
+
+### Contoh
+```go
+query_select := "SELECT username FROM user WHERE username = ? AND password = ? LIMIT 1"
+query_insert := "INSERT INTO user(username, password) VALUES(?, ?);"
+```
+
