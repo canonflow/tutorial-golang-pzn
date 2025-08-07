@@ -1,0 +1,31 @@
+package _9___golang_web
+
+import (
+	"fmt"
+	"html/template"
+	"io"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+)
+
+func TemplateLayout(writer http.ResponseWriter, request *http.Request) {
+	t := template.Must(template.ParseFiles(
+		"./templates/header.gohtml", "./templates/footer.gohtml", "./templates/layout.gohtml"),
+	)
+
+	t.ExecuteTemplate(writer, "layout", map[string]interface{}{
+		"Name":  "Nathan",
+		"Title": "Template Layout",
+	})
+}
+
+func TestTemplateLayout(t *testing.T) {
+	request := httptest.NewRequest(http.MethodGet, "localhost:8080", nil)
+	recorder := httptest.NewRecorder()
+
+	TemplateLayout(recorder, request)
+
+	body, _ := io.ReadAll(recorder.Body)
+	fmt.Println(string(body))
+}
