@@ -1,0 +1,11 @@
+<html>
+<body>
+Name: {{ .Name }}<br/>
+{{ with .Address }}
+    Address Street: {{ .Street}}<br />
+    Address City: {{ .City}}<br />
+{{ else }}
+    <h1>Anda tidak punya alamat</h1>
+{{ end }}
+</body>
+</html>
