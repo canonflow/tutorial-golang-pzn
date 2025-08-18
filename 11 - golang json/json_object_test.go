@@ -12,6 +12,14 @@ type Customer struct {
 	LastName   string
 	Age        int
 	Married    bool
+	Hobbies    []string
+	Addresses  []Address
+}
+
+type Address struct {
+	Street     string
+	Country    string
+	PostalCode string
 }
 
 func TestJsonObject(t *testing.T) {
