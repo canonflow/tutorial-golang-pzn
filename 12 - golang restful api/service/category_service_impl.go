@@ -16,7 +16,7 @@ type CategoryServiceImpl struct {
 	Validate           *validator.Validate
 }
 
-func (service CategoryServiceImpl) Create(ctx context.Context, request web.CategoryCreateRequest) web.CategoryResponse {
+func (service *CategoryServiceImpl) Create(ctx context.Context, request web.CategoryCreateRequest) web.CategoryResponse {
 	err := service.Validate.Struct(request)
 	helper.PanicIfError(err)
 
@@ -36,7 +36,7 @@ func (service CategoryServiceImpl) Create(ctx context.Context, request web.Categ
 
 }
 
-func (service CategoryServiceImpl) Update(ctx context.Context, request web.CategoryUpdateRequest) web.CategoryResponse {
+func (service *CategoryServiceImpl) Update(ctx context.Context, request web.CategoryUpdateRequest) web.CategoryResponse {
 	err := service.Validate.Struct(request)
 	helper.PanicIfError(err)
 
@@ -58,7 +58,7 @@ func (service CategoryServiceImpl) Update(ctx context.Context, request web.Categ
 
 }
 
-func (service CategoryServiceImpl) Delete(ctx context.Context, categoryId int) {
+func (service *CategoryServiceImpl) Delete(ctx context.Context, categoryId int) {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer func() {
@@ -73,7 +73,7 @@ func (service CategoryServiceImpl) Delete(ctx context.Context, categoryId int) {
 	service.CategoryRepository.Delete(ctx, tx, category)
 }
 
-func (service CategoryServiceImpl) FindById(ctx context.Context, categoryId int) web.CategoryResponse {
+func (service *CategoryServiceImpl) FindById(ctx context.Context, categoryId int) web.CategoryResponse {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer func() {
@@ -86,7 +86,7 @@ func (service CategoryServiceImpl) FindById(ctx context.Context, categoryId int)
 	return helper.ToCategoryResponse(category)
 }
 
-func (service CategoryServiceImpl) FindAll(ctx context.Context) []web.CategoryResponse {
+func (service *CategoryServiceImpl) FindAll(ctx context.Context) []web.CategoryResponse {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer func() {
