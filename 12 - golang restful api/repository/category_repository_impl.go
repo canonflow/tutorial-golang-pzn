@@ -50,7 +50,7 @@ func (repository *CategoryRepositoryImpl) FindById(ctx context.Context, tx *sql.
 	category := domain.Category{}
 	defer rows.Close()
 	if rows.Next() {
-		err = rows.Scan(&category.Id, &category.Name, &category.Id)
+		err = rows.Scan(&category.Id, &category.Name)
 		helper.PanicIfError(err)
 		return category, nil
 	} else {
@@ -67,7 +67,7 @@ func (repository *CategoryRepositoryImpl) FindAll(ctx context.Context, tx *sql.T
 	defer rows.Close()
 	for rows.Next() {
 		category := domain.Category{}
-		err = rows.Scan(&category.Id, &category.Name, &category.Id)
+		err = rows.Scan(&category.Id, &category.Name)
 		helper.PanicIfError(err)
 		categories = append(categories, category)
 	}
