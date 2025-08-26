@@ -6,6 +6,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"goalng-restful-api/app"
 	"goalng-restful-api/controller"
+	"goalng-restful-api/exception"
 	"goalng-restful-api/helper"
 	"goalng-restful-api/repository"
 	"goalng-restful-api/service"
@@ -27,6 +28,8 @@ func main() {
 	router.POST("/api/categories", categoryController.Create)
 	router.PUT("/api/categories/:categoryId", categoryController.Update)
 	router.DELETE("/api/categories/:categoryId", categoryController.Delete)
+
+	router.PanicHandler = exception.ErrorHandler
 
 	server := http.Server{
 		Addr:    ":3000",

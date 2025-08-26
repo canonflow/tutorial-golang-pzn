@@ -8,12 +8,12 @@ Accept: application/json
 Content-Type: application/json
 
 {
-  "name": "Computer"
+  "name": ""
 }
 
 
 ### Get By ID
-GET localhost:3000/api/categories/2
+GET localhost:3000/api/categories/100
 Accept: application/json
 
 
@@ -23,9 +23,9 @@ Accept: application/json
 Content-Type: application/json
 
 {
-  "name": "Fashion"
+  "name": ""
 }
 
 ### Delete Category
-DELETE localhost:3000/api/categories/1
+DELETE localhost:3000/api/categories/100
 Accept: application/json

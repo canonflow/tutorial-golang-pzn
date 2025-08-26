@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"github.com/go-playground/validator/v10"
+	"goalng-restful-api/exception"
 	"goalng-restful-api/helper"
 	"goalng-restful-api/model/domain"
 	"goalng-restful-api/model/web"
@@ -56,7 +57,10 @@ func (service *CategoryServiceImpl) Update(ctx context.Context, request web.Cate
 
 	// Find the category based on its ID
 	category, err := service.CategoryRepository.FindById(ctx, tx, request.Id)
-	helper.PanicIfError(err)
+	//helper.PanicIfError(err)
+	if err != nil {
+		panic(exception.NewNotFoundError(err.Error()))
+	}
 
 	// Update the name
 	category.Name = request.Name
@@ -75,7 +79,10 @@ func (service *CategoryServiceImpl) Delete(ctx context.Context, categoryId int) 
 
 	// Find the category based on its ID
 	category, err := service.CategoryRepository.FindById(ctx, tx, categoryId)
-	helper.PanicIfError(err)
+	//helper.PanicIfError(err)
+	if err != nil {
+		panic(exception.NewNotFoundError(err.Error()))
+	}
 
 	// Delete the category
 	service.CategoryRepository.Delete(ctx, tx, category)
@@ -89,7 +96,10 @@ func (service *CategoryServiceImpl) FindById(ctx context.Context, categoryId int
 	}()
 
 	category, err := service.CategoryRepository.FindById(ctx, tx, categoryId)
-	helper.PanicIfError(err)
+	//helper.PanicIfError(err)
+	if err != nil {
+		panic(exception.NewNotFoundError(err.Error()))
+	}
 
 	return helper.ToCategoryResponse(category)
 }
