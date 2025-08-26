@@ -1,0 +1,117 @@
+package service
+
+import (
+	"context"
+	"database/sql"
+	"github.com/go-playground/validator/v10"
+	"golang-dependency-injection/exception"
+	"golang-dependency-injection/helper"
+	"golang-dependency-injection/model/domain"
+	"golang-dependency-injection/model/web"
+	"golang-dependency-injection/repository"
+)
+
+type CategoryServiceImpl struct {
+	CategoryRepository repository.CategoryRepository
+	DB                 *sql.DB
+	Validate           *validator.Validate
+}
+
+func NewCategoryService(categoryRepository repository.CategoryRepository, DB *sql.DB, validate *validator.Validate) CategoryService {
+	return &CategoryServiceImpl{
+		CategoryRepository: categoryRepository,
+		DB:                 DB,
+		Validate:           validate,
+	}
+}
+
+func (service *CategoryServiceImpl) Create(ctx context.Context, request web.CategoryCreateRequest) web.CategoryResponse {
+	err := service.Validate.Struct(request)
+	helper.PanicIfError(err)
+
+	tx, err := service.DB.Begin()
+	helper.PanicIfError(err)
+	defer func() {
+		helper.CommitOrRollback(tx)
+	}()
+
+	category := domain.Category{
+		Name: request.Name,
+	}
+
+	category = service.CategoryRepository.Save(ctx, tx, category)
+
+	return helper.ToCategoryResponse(category)
+
+}
+
+func (service *CategoryServiceImpl) Update(ctx context.Context, request web.CategoryUpdateRequest) web.CategoryResponse {
+	err := service.Validate.Struct(request)
+	helper.PanicIfError(err)
+
+	tx, err := service.DB.Begin()
+	helper.PanicIfError(err)
+	defer func() {
+		helper.CommitOrRollback(tx)
+	}()
+
+	// Find the category based on its ID
+	category, err := service.CategoryRepository.FindById(ctx, tx, request.Id)
+	//helper.PanicIfError(err)
+	if err != nil {
+		panic(exception.NewNotFoundError(err.Error()))
+	}
+
+	// Update the name
+	category.Name = request.Name
+	category = service.CategoryRepository.Update(ctx, tx, category)
+
+	return helper.ToCategoryResponse(category)
+
+}
+
+func (service *CategoryServiceImpl) Delete(ctx context.Context, categoryId int) {
+	tx, err := service.DB.Begin()
+	helper.PanicIfError(err)
+	defer func() {
+		helper.CommitOrRollback(tx)
+	}()
+
+	// Find the category based on its ID
+	category, err := service.CategoryRepository.FindById(ctx, tx, categoryId)
+	//helper.PanicIfError(err)
+	if err != nil {
+		panic(exception.NewNotFoundError(err.Error()))
+	}
+
+	// Delete the category
+	service.CategoryRepository.Delete(ctx, tx, category)
+}
+
+func (service *CategoryServiceImpl) FindById(ctx context.Context, categoryId int) web.CategoryResponse {
+	tx, err := service.DB.Begin()
+	helper.PanicIfError(err)
+	defer func() {
+		helper.CommitOrRollback(tx)
+	}()
+
+	category, err := service.CategoryRepository.FindById(ctx, tx, categoryId)
+	//helper.PanicIfError(err)
+	if err != nil {
+		panic(exception.NewNotFoundError(err.Error()))
+	}
+
+	return helper.ToCategoryResponse(category)
+}
+
+func (service *CategoryServiceImpl) FindAll(ctx context.Context) []web.CategoryResponse {
+	tx, err := service.DB.Begin()
+	helper.PanicIfError(err)
+	defer func() {
+		helper.CommitOrRollback(tx)
+	}()
+
+	categories := service.CategoryRepository.FindAll(ctx, tx)
+
+	return helper.ToCategoryResponses(categories)
+}
