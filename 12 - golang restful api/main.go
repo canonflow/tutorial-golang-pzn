@@ -8,6 +8,7 @@ import (
 	"goalng-restful-api/controller"
 	"goalng-restful-api/exception"
 	"goalng-restful-api/helper"
+	"goalng-restful-api/middleware"
 	"goalng-restful-api/repository"
 	"goalng-restful-api/service"
 	"net/http"
@@ -33,7 +34,7 @@ func main() {
 
 	server := http.Server{
 		Addr:    ":3000",
-		Handler: router,
+		Handler: middleware.NewAuthMiddleware(router),
 	}
 
 	err := server.ListenAndServe()
