@@ -94,3 +94,19 @@ func InitializedReader() io.Reader {
 
 	return nil
 }
+
+// Struct Field Provider
+func InitializedConfiguration() *Configuration {
+	// Mencari Configuration di Application dan dijadikan sbg provider
+	/*
+		application := NewApplication()
+		configuration := application.Configuration
+		return configuration
+	*/
+	wire.Build(
+		NewApplication,
+		wire.FieldsOf(new(*Application), "Configuration"),
+	)
+
+	return nil
+}
