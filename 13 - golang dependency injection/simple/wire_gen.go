@@ -37,9 +37,21 @@ func InitializeFooBarService() *FooBarService {
 	return fooBarService
 }
 
+func InitialieHelloService() *HelloService {
+	sayHelloImpl := NewSayHelloImpl()
+	helloService := NewHelloService(sayHelloImpl)
+	return helloService
+}
+
 // injector.go:
 
+// Provider Set
 // Hanya Groping antar Provider
 var fooSet = wire.NewSet(NewFooRepository, NewFooService)
 
 var barSet = wire.NewSet(NewBarRepository, NewBarService)
+
+// Binding Interface
+var helloSet = wire.NewSet(
+	NewSayHelloImpl, wire.Bind(new(SayHello), new(*SayHelloImpl)),
+)

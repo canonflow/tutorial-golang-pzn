@@ -26,11 +26,36 @@ func InitializeDatabaseRepository() *DatabaseRepository {
 	return nil
 }
 
+// Provider Set
 // Hanya Groping antar Provider
 var fooSet = wire.NewSet(NewFooRepository, NewFooService)
 var barSet = wire.NewSet(NewBarRepository, NewBarService)
 
 func InitializeFooBarService() *FooBarService {
 	wire.Build(fooSet, barSet, NewFooBarService)
+	return nil
+}
+
+// Binding Interface
+var helloSet = wire.NewSet(
+	NewSayHelloImpl,
+	wire.Bind(new(SayHello), new(*SayHelloImpl)), // Kalau ada provider yang butuh SayHello, maka kirim *SayHelloImpl
+)
+
+func InitialieHelloService() *HelloService {
+	/* ===== Harapannya =====
+	sayHello := NewSayHelloImpl()
+	helloService := NewHelloService(sayHello)
+	*/
+
+	/*
+		Salah -> Karena parameter HelloService berupa interface SayHello, walaupun SayHelloImpl merupakan
+		struct kontrak dari interface SayHello
+	*/
+	//wire.Build(NewHelloService, NewSayHelloImpl)
+
+	// Perlu melakukan Binding Interface (kode di atas function ini)
+	wire.Build(helloSet, NewHelloService)
+
 	return nil
 }
