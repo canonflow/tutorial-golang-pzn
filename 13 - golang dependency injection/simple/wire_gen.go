@@ -89,6 +89,16 @@ func InitializedConfiguration() *Configuration {
 	return configuration
 }
 
+// Clean Up Function
+func InitializedConnection(name string) (*Connection, func()) {
+	file, cleanup := NewFile(name)
+	connection, cleanup2 := NewConnection(file)
+	return connection, func() {
+		cleanup2()
+		cleanup()
+	}
+}
+
 // injector.go:
 
 // Provider Set

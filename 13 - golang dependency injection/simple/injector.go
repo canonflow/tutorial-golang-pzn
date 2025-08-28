@@ -110,3 +110,18 @@ func InitializedConfiguration() *Configuration {
 
 	return nil
 }
+
+// Clean Up Function
+func InitializedConnection(name string) (*Connection, func()) {
+	/*
+		file, cleanup := NewFile(name)
+		connection, cleanup2 := NewConnection(file)
+		return connection, func() {
+			cleanup2()
+			cleanup()
+		}
+	*/
+	wire.Build(NewConnection, NewFile)
+
+	return nil, nil
+}
