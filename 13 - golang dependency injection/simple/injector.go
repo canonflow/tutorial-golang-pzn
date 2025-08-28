@@ -59,3 +59,15 @@ func InitialieHelloService() *HelloService {
 
 	return nil
 }
+
+// Struct Provider
+// ===== STRUCT PROVIDER =====
+func InitializedFooBarStruct() *FooBarStruct {
+	wire.Build(
+		NewFoo,
+		NewBar,
+		wire.Struct(new(FooBarStruct), "Foo", "Bar"), // Use * for all fields
+	)
+
+	return nil
+}

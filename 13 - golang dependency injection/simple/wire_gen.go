@@ -43,6 +43,18 @@ func InitialieHelloService() *HelloService {
 	return helloService
 }
 
+// Struct Provider
+// ===== STRUCT PROVIDER =====
+func InitializedFooBarStruct() *FooBarStruct {
+	foo := NewFoo()
+	bar := NewBar()
+	fooBarStruct := &FooBarStruct{
+		Foo: foo,
+		Bar: bar,
+	}
+	return fooBarStruct
+}
+
 // injector.go:
 
 // Provider Set
