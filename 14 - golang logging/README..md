@@ -42,14 +42,24 @@
 - Sebelumnya melakukan logging, kita bisa menggunakan function `logger.WithField()` untuk menambahkan FIeld yang kita inginkan.
 
 ### Beberapa Fields
-- Kita juga bisa langsung memasukkan beberapa Field dengna menggunakan **Fields**
+- Kita juga bisa langsung memasukkan beberapa Field dengan menggunakan **Fields**
 - **Fields** adalah alias untuk map[string]interface{}
 - Caranya kita bisa menggunakan function `logger.WithFields()`.
 
 ---
 
 ## Entry
-- **Entry** adalah sebuah struct representasi dari log yang kita kirim menggunakan Logrus.
+- **Entry** adalah sebuah Struct representasi dari log yang kita kirim menggunakan Logrus.
 - **Setiap log yang kita kirim**, maka akan dibuatkan object **Entry**
 - Contohnya ketika kita **membuat Formatter sendiri**, maka parameter yang ktia dapat untuk melakukan fornmatting bukanlah string message, melainkan object **Entry**
 - Untuk membuat Entry, kita bisa menggunakan function `logrus.NewEntry()`.
+
+---
+
+## Hook
+- **Hook** adalah sebuah Struct yang bisa kita **tambahkan** ke Logger sebagai **callback** yang **akan dieksekusi** ketika **terdapat kejadian** log untuk **level tertentu**.
+- Contohnya, **ketika ada log error**, kita **ingin mengirimkan notifikasi** via chat ke programmer, dan lain2.
+- Kita bisa menambahkan Hook ke Logger dengan menggunakan function `logger.AddHook()`.
+- Dan kita juga **bisa menambahkan lebih dari 1 Hook** ke Logger.
+
+---
