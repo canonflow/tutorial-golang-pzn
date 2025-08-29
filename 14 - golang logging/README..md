@@ -25,4 +25,9 @@
 
 ---
 
-## 
+## Formatter
+- Saat Logger mengirimkan data ke output, log yang kita kirim akan diformat menggunakan object Formatter.
+- Logrus secara default memiliki **2 formatter**.
+- TextFormatter, yang **secara default digunakan**
+- JSONFormatter, yang bisa digunakan untuk memformat pesar log menjadi data JSON.
+- Untuk mengubah formatter, kita bisa gunakan function `logger.SetFormatter()`.

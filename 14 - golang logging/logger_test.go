@@ -44,3 +44,20 @@ func TestOutput(t *testing.T) {
 	logger.Warn("This is a Warn")
 	logger.Error("This is a Error")
 }
+
+func TestFormatter(t *testing.T) {
+	logger := logrus.New()
+	logger.SetFormatter(new(logrus.JSONFormatter)) // atau pakai &logrus.JSONFormatter
+
+	logger.Info("Hello Formatter!")
+	logger.Warn("Hello Formatter!")
+	logger.Error("Hello Formatter!")
+	/*
+		=== RUN   TestFormatter
+		{"level":"info","msg":"Hello Formatter!","time":"2025-08-29T13:22:35+07:00"}
+		{"level":"warning","msg":"Hello Formatter!","time":"2025-08-29T13:22:35+07:00"}
+		{"level":"error","msg":"Hello Formatter!","time":"2025-08-29T13:22:35+07:00"}
+		--- PASS: TestFormatter (0.00s)
+		PASS
+	*/
+}
