@@ -45,3 +45,11 @@
 - Kita juga bisa langsung memasukkan beberapa Field dengna menggunakan **Fields**
 - **Fields** adalah alias untuk map[string]interface{}
 - Caranya kita bisa menggunakan function `logger.WithFields()`.
+
+---
+
+## Entry
+- **Entry** adalah sebuah struct representasi dari log yang kita kirim menggunakan Logrus.
+- **Setiap log yang kita kirim**, maka akan dibuatkan object **Entry**
+- Contohnya ketika kita **membuat Formatter sendiri**, maka parameter yang ktia dapat untuk melakukan fornmatting bukanlah string message, melainkan object **Entry**
+- Untuk membuat Entry, kita bisa menggunakan function `logrus.NewEntry()`.
