@@ -1,0 +1,3 @@
+time="2025-08-29T13:18:05+07:00" level=info msg="This is a Info"
+time="2025-08-29T13:18:05+07:00" level=warning msg="This is a Warn"
+time="2025-08-29T13:18:05+07:00" level=error msg="This is a Error"
