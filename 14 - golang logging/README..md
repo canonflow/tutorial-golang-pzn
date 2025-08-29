@@ -31,3 +31,17 @@
 - TextFormatter, yang **secara default digunakan**
 - JSONFormatter, yang bisa digunakan untuk memformat pesar log menjadi data JSON.
 - Untuk mengubah formatter, kita bisa gunakan function `logger.SetFormatter()`.
+
+---
+
+## Field
+- Saat kita mengirim informasi log, kadang kita ingin **menyisipkan sesuatu pada log tsb**.
+- Misal saja, seperti informasi **siapa yang login di log-nya**
+- Cara manual kita bisa menambahkan informasi di messagenya, tapi Logrus menyediakan cara yang lebih baik, yaitu menggunakan fitur **Field**.
+- Dengan fitru **Field**, kita bisa menambahkan Field tambahan di informasi Log yang kita kirim.
+- Sebelumnya melakukan logging, kita bisa menggunakan function `logger.WithField()` untuk menambahkan FIeld yang kita inginkan.
+
+### Beberapa Fields
+- Kita juga bisa langsung memasukkan beberapa Field dengna menggunakan **Fields**
+- **Fields** adalah alias untuk map[string]interface{}
+- Caranya kita bisa menggunakan function `logger.WithFields()`.
