@@ -216,3 +216,20 @@ type Number interface {
 	~int | int8 | int16 | int32 | int64 | float32 | float63
 }
 ```
+
+---
+
+## Type Inference
+- Type Inference merupakan fitur dimana kita **tidak perlu menyebutkan Type Parameter ketika memanggil kode Generic**
+- Tipe data Type Parameter **bisa dibaca secara otomatis** misal **dari parameter yang kita kirim**
+- Namun perlu diingat, **pada beberapa kasus**, jika **terjadi error** karena Type Inference, kita bisa **dengan mudah memperbaikinya** dengan **cara menyebutkan Type Parameternya saja**.
+
+### Kode: Type Inference
+```go
+func TestTypeInference(t *testing.T) {
+    assert.Equal(t, int(100), Min(100, 200))
+    assert.Equal(t, int64(100), Min(int64(100), int64(200)))
+    assert.Equal(t, float64(100), Min(100.0, 200.0))
+    assert.Equal(t, Age(100), Min(Age(100), Age(200)))
+}
+```
