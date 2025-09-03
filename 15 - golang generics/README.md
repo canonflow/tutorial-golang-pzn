@@ -46,10 +46,41 @@ func Length[T]() {
 - Penggunaan Type Parameter bisa lebih dari 1, cukup gunakan tanda **, (koma)** sbg pemisah.
 - Nama Type Parameter **harus berbeda**, tidak boleh sama jika kita menambahkan Type Parameter lebih dari 1.
 
-### Kode: 
+### Kode: Multiple Type Parameter
 ```go
 func MultipleParameter[T1 any, T2 any](param1 T1, param2 T2) {
 	fmt.Println(param1)
 	fmt.Println(param2)
+}
+```
+
+---
+
+## Comparable
+- Selain `any` di Golang 1.18, juga **terdapat tide data** bernama `comparable`
+- `comparable` merupakan **interface yg diimplementasikan** oleh tipe data yang bisa dibandingkan (menggunakan operator **!=** dan **==**), seperti:
+  - Booleans
+  - Numbers
+  - Strings
+  - Pointers
+  - Channels
+  - Interfaces
+  - Array
+
+  yang isinya ada **comparable type**, atau `structs` yang **fieldsnya** adalah **comparable type**.
+
+### Kode: Comparable
+```go
+func IsSame[T comparable](val1, val2 T) bool {
+	if val1 == val2 {
+		return true
+    } else {
+	    return false	
+    }   
+}
+
+func TestIsSame(t *testing.T) {
+	assert.Equal(t, true, IsSame[string]("nathan", "nathan"))
+	assert.Equal(t, true, IsSame[int](100, 100))
 }
 ```
