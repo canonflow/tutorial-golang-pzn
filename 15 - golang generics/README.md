@@ -249,3 +249,46 @@ func PrintBag[T any] (bag Bag[T]) {
     }   
 }
 ```
+
+---
+
+## Generic Struct
+- Struct juga mendukun Generic
+- Dengan menggunakan generic, kita **bisa membuat Field** dengan tipe data **yang sesuai dengan Type Parameter**
+
+### Kode: Generic Struct
+```go
+type Data[T any] struct {
+	First T
+	Second T
+}
+
+func TestData(t *testing.T) {
+    data := Data[string] {
+        First: "Nathan",
+		Second: "Garzya",
+    }
+	fmt.Println(data)
+}
+```
+
+
+### Generic Method
+- Selain di function, kita juga bisa tambahkan generic di **method (function di struct)**.
+- Namun, Generic di method **merupakan Generic yang terdapat di struct-nya**.
+- Kita **wajib menyebutkan** semua Type Parameter yang terdapat di struct, walaupun **tidak kita gunakan**, misalnya atau jika **tidak ingin gunakan**, kita bisa gunakan **_ (garis bawah)** sebagai pengganti Type Parameternya.
+- Method **tidak bisa memiliki** Type Parameter **yang mirip** dengan di function.
+
+
+### Kode: Generic Method
+```go
+func (d *Data[_]) SayHello(name string) string {
+    return "Hello " + name
+}
+
+func (d *Data[T]) ChangeFirst(first T) T {
+    d.First = first
+    return first
+}
+
+```
