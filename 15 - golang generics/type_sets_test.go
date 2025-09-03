@@ -5,8 +5,10 @@ import (
 	"testing"
 )
 
+type Age int
+
 type Number interface {
-	int | int8 | int16 | int32 | int64 | float32 | float64
+	~int | int8 | int16 | int32 | int64 | float32 | float64
 }
 
 func Min[T Number](first T, second T) T {
@@ -26,6 +28,16 @@ func TestTypeSets(t *testing.T) {
 	/*
 		=== RUN   TestTypeSets
 		--- PASS: TestTypeSets (0.00s)
+		PASS
+	*/
+}
+
+func TestTypeApproximation(t *testing.T) {
+	assert.Equal(t, Age(100), Min[Age](Age(100), Age(200.0))) // Age diperbolehkan, karena memakai Type Approximation untuk tipe dasat 'int'
+
+	/*
+		=== RUN   TestTypeApproximation
+		--- PASS: TestTypeApproximation (0.00s)
 		PASS
 	*/
 }

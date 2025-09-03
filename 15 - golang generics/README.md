@@ -174,9 +174,45 @@ type Number interface {
 
 func Min[T Number](first T, second T) T {
     if first < second {
-        return first
+        return firstf
     } else {
         return second	
     }   
+}
+```
+
+---
+
+## Type Approximation
+- Kadang, kita sering membuat **Type Declaration** di Golang untuk **tipe data lain**, misal kita membuat tipe data `Age` untuk `int`.
+- Secara **default**, jika kita gunakan `Age` sbg type declaration untuk `int`, lalu kita **membuat Type Set** yang **berisi constraint** `int`, maka tipe data `Age` **dianggap tidak compatible** dengan Type Set yang kita buat.
+
+### Kode: Type Declaration
+```go
+type Age int
+
+type Number interface {
+	int | int8 | int16 | int32 | int64 | float32 | float63
+}
+```
+
+### Kode: Test Type Declaration
+```go
+func TestTypeSets(t *testing.T) {
+	assert.Equal(t, int(100), Min[int](100, 200))
+	assert.Equal(t, int64(100), Min[int64](100, 200))
+	assert.Equal(t, float64(100), Min[float64](100.0, 200.0))
+	assert.Equal(t, Age(100), Min[Age](Age(100), Age(100)) // Error
+}
+```
+- Untungnya, di Golang memiliki feature bernama **Type Approximation**, dimana kita bisa menyebutkan bahwa **semua constraint** dengan tipe **tersebut** dan juga yang **memiliki tipe dasarnya** adalah tipe tersebut, maka **bisa digunakan**
+- Untuk menggunakan Type Approximation, kita bisa gunakan tanda **~ (tilde)**
+
+### Kode: Type Approximation
+```go
+type Age int
+
+type Number interface {
+	~int | int8 | int16 | int32 | int64 | float32 | float63
 }
 ```
