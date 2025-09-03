@@ -144,3 +144,39 @@ func (m *MyVicePresident) GetVicePresidentName() string {
 	return m.Name
 }
 ```
+
+---
+
+
+## Type Sets
+- Salah satu fitur yang menarik di Golang Generic adalah **Type Sets**
+- Dengan fitur ini, kita **bisa menentukan lebih dari 1** tipe constraint **yang diperbolehkan** pada Type Parameter.
+
+### Membuat Type Set
+- Type Set adalah **sebuah** `interface`
+- Cara membuat Type Set:
+- ```go
+  type NamaTypeSet interface {
+    P | Q | R
+  }
+  ```
+- Type Set **hanya bisa digunakan pada Type Parameter**, tidak bisa digunakan sbg tipe data field / variable.
+- Jika **operator bisa digunakan di semua tipe data di dalam Type Set**, maka operator tsb **bisa digunakan dalam kode generic**.
+
+### Diagram Type Set
+![Diagram](./assets/2.png)
+
+### Kode: Type Set Interface
+```go
+type Number interface {
+    int | int8 | int16 | int32 | int64 | float32 | float64
+}
+
+func Min[T Number](first T, second T) T {
+    if first < second {
+        return first
+    } else {
+        return second	
+    }   
+}
+```
