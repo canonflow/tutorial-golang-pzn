@@ -233,3 +233,19 @@ func TestTypeInference(t *testing.T) {
     assert.Equal(t, Age(100), Min(Age(100), Age(200)))
 }
 ```
+
+---
+
+## Generic Type
+- Generic **bisa digunakan** juga ketika **membuat Type**
+
+### Kode: Generic Type
+```go
+type Bag[T any] []T
+
+func PrintBag[T any] (bag Bag[T]) {
+    for _, val := range bag {
+        fmt.Println(val)
+    }   
+}
+```
