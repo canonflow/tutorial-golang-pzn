@@ -84,3 +84,63 @@ func TestIsSame(t *testing.T) {
 	assert.Equal(t, true, IsSame[int](100, 100))
 }
 ```
+
+---
+
+## Type Parameter Inheritance
+- Golang sendiri **tidak memiliki pewarisan**, namun seperti kita ketahui, jika kita membuat sebuah type yang **sesuai dengan kontrak interface**, maka dianggal sbg **implementasi interface tsb**.
+- Type Parameter juga **mendukung hal serupa**, kita bisa gunakan constraint dengan menggunakan `interface`, maka secara otomatis **semua interface** yang **compatible** dengan type constraint tsb bisa kita gunakan.
+
+### Diagram
+![Diagram](./assets/1.png)
+
+## Kode: Employee Interface
+```go
+type Employee interface {
+	GetName() string
+}
+
+func GetName[T Employee](parameter T) string {
+	return parameter.GetName()
+}
+```
+
+## Kode: Manager Interface
+```go
+type Manager interface {
+	GetName() string
+	GetManagerName() string
+}
+
+type MyManager struct {
+	Name string
+}
+
+func (m *MyManager) GetName() string {
+	return m.Name
+}
+
+func (m *MyManager) GetManagerName() string {
+	return m.Name
+}
+```
+
+### Kode: Vice President Interface
+```go
+type VicePresident interface {
+	GetName() string
+	GetVicePresidentName() string
+}
+
+type MyVicePresident struct {
+	Name string
+}
+
+func (m *MyVicePresident) GetName() string {
+	return m.Name
+}
+
+func (m *MyVicePresident) GetVicePresidentName() string {
+	return m.Name
+}
+```
