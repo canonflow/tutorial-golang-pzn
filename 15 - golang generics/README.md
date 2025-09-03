@@ -40,3 +40,16 @@ func Length[T]() {
 - Kita cukup gunakan nama Type Parameternya saja.
 - Type Parameter **hanya bisa digunakan di function saja**, tidak bisa digunakan di luar function.
 
+---
+
+## Multiple Type Parameter
+- Penggunaan Type Parameter bisa lebih dari 1, cukup gunakan tanda **, (koma)** sbg pemisah.
+- Nama Type Parameter **harus berbeda**, tidak boleh sama jika kita menambahkan Type Parameter lebih dari 1.
+
+### Kode: 
+```go
+func MultipleParameter[T1 any, T2 any](param1 T1, param2 T2) {
+	fmt.Println(param1)
+	fmt.Println(param2)
+}
+```
