@@ -17,6 +17,7 @@
 ---
 
 ## Golang Migrate
+
 - Golang Migrate adalah salah satu tool untuk Database Migration yg populer digunakan oleh programmer Golang.
 - Golang migrate bisa diintegrasikan dengan aplikasi, atau dijalankan sbg aplikasi **standalnone**.
 - Golang migrate mendukun banyak sekali database, seperti
@@ -27,3 +28,22 @@
   - Cassandra
   - Dll
 
+---
+
+## Menginstall Golang Migrate
+
+- Untuk menginstall Golang Migrate, sangat mudah. Kita bisa gunakan perintah berikut:
+  - `go install -tags "database1,database2"
+  - github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+- Sesuaikan dengand database yang ingin kita gunakan, bisa lebih dari 1 dengan cara menambahkan koma.
+
+### Kode:
+
+```shell
+~ go install -tags 'postgres,mysql' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+```
+
+### Aplikasi Migrate
+
+- Saat menginstall Golang Migrate, secara otomatis terdapat **executable file** di folder `$GOPATH/bin/` dengan nama **migrate**.
+- **File migrate** tsb adalah **aplikasi Golang Migrate** yang akan kita gunakan untuk membuat Database Migration.
