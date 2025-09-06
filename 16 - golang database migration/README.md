@@ -13,3 +13,17 @@
 - Database Migration adalah mekanisme untuk **melakukan tracking** perubahan struktur database, mulai dari awal dibuat sampai perubahaan terakhir yg dilakukan.
 - Dengan menggunakan migration, semua tim member bisa melihat perubahan struktur database, dan bisa dengan mudah menjalankan perubahan tersebut di tiap komputer masing2.
 - Selain itu, dengan adanya migration, kita bisa melakukan **review terlebih dahulu**, sblm menjalankan perubahan di database.
+
+---
+
+## Golang Migrate
+- Golang Migrate adalah salah satu tool untuk Database Migration yg populer digunakan oleh programmer Golang.
+- Golang migrate bisa diintegrasikan dengan aplikasi, atau dijalankan sbg aplikasi **standalnone**.
+- Golang migrate mendukun banyak sekali database, seperti
+  - MySQL
+  - PostgreSQL
+  - SQLITE
+  - MongoDB
+  - Cassandra
+  - Dll
+
