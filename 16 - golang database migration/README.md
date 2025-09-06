@@ -79,3 +79,11 @@
 - File down adalah file yg berisikan kode untuk **mengembalikan perubahan yang kita lakukan di file up**.
 - Kenapa diperlukan? Karena misal **terjadi masalah di aplikasi**, namin database migration **terlanjut dijalankan**, kita bisa melakukan `rollback` dengan cara **menjalankan file down**, karena berisikan kode unutk mengembalikan perubahan di file up.
 - Pada kasus ini, misal kita akan menghapus lagi table `categories`.
+
+---
+
+## Membuat Database
+
+- Sebelum menjalankan Database Migration, sekarang kita perlu membuat dulu database-nya.
+- Hal ini karena pembuatan database tidak dilakukan di database migration, biasanya dilakukan manual di awal.
+- Pada kasus ini, kita menggunakan database MySQL, dan kita perlu ubah kode koneksi database di aplikasi agar terhubung dengan database baru.
