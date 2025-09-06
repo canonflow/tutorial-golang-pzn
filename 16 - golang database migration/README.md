@@ -126,3 +126,42 @@
 - Misal jika ingin melakukan `rollback`, mungkin kita hanya ingin `rollback` **1 versi saja**, tidak mau melakukan `rollback` semua versi.
 - Untuk kasus ini, **setelah** perintah **up** atau **down**, kita bisa **memasukkan angka**, yaitu **jumlah migration yang ingin kita eksekusi**.
   - Contoh: `migrate -database "mysql://root@tcp(localhost:3307)/belajar_golang_database_migration" -path db/migration up 1`
+
+---
+
+## Dirty State
+
+- Saat kita membuat database migration, **kadang kesalahan sering terjadi**.
+- Misal, kita **melakukan typo** sehingga membuat perintah SQL-nya salah.
+- Jika kita **terlanjur menjalankan database migration**, maka `state` akan berubah menjadi **Dirty State**.
+- State dimana kita **tidak bisa** melakukan **UP** atau **DOWN** lagi.
+- Pada kasus ini, kita **harus perbaiki manual**, kenapa harus manual? Karena **tidak ada cara otomatis** memperbaikinya.
+
+### Permasalahan
+
+- Permasalahan migration ini adalah kita membuat 2 table di file migration, pada pembuatan table pertama **sukses**, namun pada table kedua **gagal**.
+- Artinya file migration **tidak sempurna**, dan **kita juga tidak bisa melakukan** `rollback`. karena **table kedua belum sukses dibuat**.
+- Pada kondisi ini, terjadi yg namanya **Dirty State**, dimana kita tidak bisa melakukan **up** atau **down**, yang perlu kita lakukan adalah **memperbaiki secara manual**.
+
+### Kode:
+
+```sql
+DROP TABLE correct;
+```
+
+> Karena pada file migration 'xxx' terdapat pembuatan 2 table dan table pertama yg sukses pada versi migration tersebut bernama `correct`, sehingga kita perlu melakukan **drop table**
+
+### Mengubah Versi
+
+- Setelah kita memperbaiki secara manual, selanjutnya kita **perlu mengubah versi migration** di table `schema_migrations`.
+- Kita bisa lakukan manual, atau otomatis menggunakan perintah:
+  - `migrate -database "koneksidatabase" -path folder force versi`
+- Dimana `versi` adalah versi dari file database migration.
+- Pada kasus ini, kita akan **gunakan 1 versi sblm migration yang gagal**.
+- Untuk dapat melihat versi saat ini, dapat gunakan perintah:
+  - `migrate -database "koneksidatabase" -path version`
+
+### Selanjutnya
+
+- Selanjutnya kita bisa perbaiki file database migration-nya.
+- Lalu ulangi dengan menjalankan migration-nya.
