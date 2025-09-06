@@ -63,3 +63,10 @@
 - File migration akan **diawali dengan waktu** ketika kita membuat file migration, lalu diikuti dengan **nama migration** dan diakhir dengan **tipe migration**.
 - misal `20220921103313_create_table_category.up.sql`
 - Kenapa diawali dengan waktu? Agar file migration **selalu berurut** sesuai dengan waktu kita membuat file tsb.
+
+---
+
+## Migration Up
+
+- File migration dengan akhiran **up** adalah file yang **harus kita isi** dengan **perubahan yang ingin kita tambahkan**.
+- Misal, sekarang kita akan tambahkan table `category`, sesuai dengan aplikasi RESTful API yang sudah kita buat.
