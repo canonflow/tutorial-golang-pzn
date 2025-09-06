@@ -87,3 +87,15 @@
 - Sebelum menjalankan Database Migration, sekarang kita perlu membuat dulu database-nya.
 - Hal ini karena pembuatan database tidak dilakukan di database migration, biasanya dilakukan manual di awal.
 - Pada kasus ini, kita menggunakan database MySQL, dan kita perlu ubah kode koneksi database di aplikasi agar terhubung dengan database baru.
+
+---
+
+## Menjalankan Migration
+
+- Kita dapat menjalankan database migration menggunakan perintah:
+  - `migrate -database "koneksidatabase" -path folder up`
+- `-database` harus berisikan **koneksi database**, misalnya untuk MySQL bisa menggunakan:
+  - `mysql://user:password@tcp(host:port)/nama_database`
+- Untuk database lain, bisa dilihat di halaman dokumentasinya: [https://github.com/golang-migrate/migrate#databases](https://github.com/golang-migrate/migrate#databases)
+- `-path` adalah **lokasi folder file** database migration.
+- `up` adalah perintah untuk menjalankan database migration dengan **mode up**.
