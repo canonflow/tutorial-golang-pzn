@@ -116,3 +116,13 @@
 - Pada waktu terjadi masalah pada aplikasi, yg menyebabkan kita harus melakukan **rollback** perubahan, apa yg harus dilakukan?
 - Fitur itu sudah ada di Golang Migrate, jadi kita bisa menjalankan **mode down** untuk melakukan `rollback` dengan perintah:
   - `migrate -database "koneksidatabase" -path folder down
+
+---
+
+## Migrasi ke Versi Tertentu
+
+- Saat menggunakan mode **up** atau **down**, secara **otomatis** akan melakukan **migrasi seluruh file**.
+- Kadang pada kenyataannya, kita mungkin hanya ingin melakukan **up** atau **down** ke **versi tertentu saja**.
+- Misal jika ingin melakukan `rollback`, mungkin kita hanya ingin `rollback` **1 versi saja**, tidak mau melakukan `rollback` semua versi.
+- Untuk kasus ini, **setelah** perintah **up** atau **down**, kita bisa **memasukkan angka**, yaitu **jumlah migration yang ingin kita eksekusi**.
+  - Contoh: `migrate -database "mysql://root@tcp(localhost:3307)/belajar_golang_database_migration" -path db/migration up 1`
