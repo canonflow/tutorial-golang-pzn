@@ -108,3 +108,11 @@
 - Golang Migrate akan menyimpan **state terakhir** kita menjalankan database migration, artinya **tidak akan dijalankan dari awal lagi**, melainkan dari file terakhir yang sukses di migrasi.
 - Jadi kita tidak perlu takut file akan dijalankan lagi, jd tidak perlu hapus file migration-nya.
 - Semua informasi **state** tersebut disimpan dalam table `schema_migrations`.
+
+---
+
+## Rollback Migration
+
+- Pada waktu terjadi masalah pada aplikasi, yg menyebabkan kita harus melakukan **rollback** perubahan, apa yg harus dilakukan?
+- Fitur itu sudah ada di Golang Migrate, jadi kita bisa menjalankan **mode down** untuk melakukan `rollback` dengan perintah:
+  - `migrate -database "koneksidatabase" -path folder down
