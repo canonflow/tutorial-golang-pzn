@@ -423,3 +423,53 @@ func TestGetFirst(t *testing.T) {
     assert.Equal(t, "Nathan", first)
 }
 ```
+
+---
+
+## Experimental Package
+
+- Terdapat Experimental Package yang benyak menggunakan fitur Generic namnun belum resmi masuk ke Golang Standard Library.
+
+### Kode: Experimental Constraints
+
+```go
+func ExperimentalMin[T constraints.Ordered](first T, second T) T {
+    if first < second {
+        return first
+    } else {
+        return second
+    }
+}
+```
+
+### Maps & Slices Package
+
+- Terdapat juga package maps dan slices, yang berisi function untuk mengelola data `Map` dan `Slice`, namun sudah menggunakan **fitur Generic**.
+
+#### Kode: Experimental Maps
+
+```go
+func TestExperimentalMaps(t *testing.T) {
+    first := map[string]string{
+        "Name": "Nathan",
+    }
+
+    second := map[string]string{
+        "Name": "Nathan",
+    }
+
+    assert.True(t, maps.Equal(first, second))
+}
+```
+
+#### Kode: Experimental Slices
+
+```go
+func TestExperimentalSlices(t *testing.T) {
+    first := []string{"Nathan"}
+    second := []string{"Nathan"}
+
+    assert.True(t, slices.Equal(first, second))
+}
+
+```
