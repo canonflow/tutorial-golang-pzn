@@ -69,4 +69,13 @@
 ## Migration Up
 
 - File migration dengan akhiran **up** adalah file yang **harus kita isi** dengan **perubahan yang ingin kita tambahkan**.
-- Misal, sekarang kita akan tambahkan table `category`, sesuai dengan aplikasi RESTful API yang sudah kita buat.
+- Misal, sekarang kita akan tambahkan table `categories`, sesuai dengan aplikasi RESTful API yang sudah kita buat.
+
+---
+
+## Migration Down
+
+- Setiap file migration, selain up terdapat juga file **down**.
+- File down adalah file yg berisikan kode untuk **mengembalikan perubahan yang kita lakukan di file up**.
+- Kenapa diperlukan? Karena misal **terjadi masalah di aplikasi**, namin database migration **terlanjut dijalankan**, kita bisa melakukan `rollback` dengan cara **menjalankan file down**, karena berisikan kode unutk mengembalikan perubahan di file up.
+- Pada kasus ini, misal kita akan menghapus lagi table `categories`.
