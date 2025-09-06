@@ -47,3 +47,19 @@
 
 - Saat menginstall Golang Migrate, secara otomatis terdapat **executable file** di folder `$GOPATH/bin/` dengan nama **migrate**.
 - **File migrate** tsb adalah **aplikasi Golang Migrate** yang akan kita gunakan untuk membuat Database Migration.
+
+---
+
+## Membuat Database Migration
+
+- Untuk membuat database migration, kita bisa gunakan perintah:
+  - `migrate create -ext sql -dir db/migration nama_file_migration`
+- `-ext` adalah **file extension**, artinya kita membuat file `.sql.`.
+- `-dir` adalah **folder tempat disimpan**.
+- Usahakan tidak menggunakan spasi pada nama file migration.
+
+### File Migration
+
+- File migration akan **diawali dengan waktu** ketika kita membuat file migration, lalu diikuti dengan **nama migration** dan diakhir dengan **tipe migration**.
+- misal `20220921103313_create_table_category.up.sql`
+- Kenapa diawali dengan waktu? Agar file migration **selalu berurut** sesuai dengan waktu kita membuat file tsb.
