@@ -370,3 +370,56 @@ func TestInterface(t *testing.T) {
     assert.Equal(t, "Nathan", result)
 }
 ```
+
+---
+
+## In Line Type Constraint
+
+- Sebelumnya, kita selalu menggunakan **Type Declaration** atau **Type Set** ketika membuat Type Constraint di type parameter.
+- Sebenarnya **tidak ada kewajiban** kita harus membuat type declaration atau type set **jika** kita ingin membuat Type Parameter, kita bisa **gunakan secara langsung (in line)** pada Type Constraint, misalnya di awal kita sudah bahas tentang `interface{}` (kosong), tapi kita selalu gunakan type declaration `any`.
+- Jika kita mau, kita juga bisa langsung gunakan `interface{int | float32 | float64}` dibanding membuat Type Set Number **misalnya**.
+
+### Kode: In Line Type Constraint
+
+```go
+func FindMin[T interface{ int | int64 | float64}](first T second T) T {
+    if first < second {
+        return first
+    } else {
+        return second
+    }
+}
+
+func TestFindMin(t *testing.T) {
+    assert.Equal(t, 100, FindMin(100, 200))
+    assert.Equal(t, int64(100), FindMin(int64(100), int64(200)))
+    assert.Equal(t, 100.0, FindMin(100.0, 200.0))
+}
+```
+
+### Generic di Type Parameter
+
+- Pada kasus tertentu, **kadang ada kebutuhan** kita **menggunakan Type Parameter** yang ternyata Type tersebut juga **generic / memiliki Type Parameter**.
+- Kita juga bisa menggunakan **in line type constraint** agar lebih mudah, dengan cara **menambahkan type parameter selanjutnya**, misal
+  - `[S interface{[]E}, E interface{}]`, artinya **S harus slice element E**, dimana **E boleh tipe apapun**.
+  - `[S []E, E any]`, artinya **S harus slice element E**, dimana **E boleh tipe apapun**.
+
+#### Kode: Generic di Type Parameter
+
+```go
+func GetFirst[T []E, E any](data T) E {
+    first := data[0]
+    return first
+}
+
+func TestGetFirst(t *testing.T) {
+    names := []string{
+        "Nathan",
+        "Garzya",
+        "Santoso",
+    }
+
+    first := GetFirst[[]string, string](names)
+    assert.Equal(t, "Nathan", first)
+}
+```
