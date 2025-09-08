@@ -105,3 +105,41 @@ func TestOrRule(t *testing.T) {
 		// Key: 'Login.Username' Error:Field validation for 'Username' failed on the 'email|numeric' tag
 	}
 }
+
+func MustEqualIgnoreCase(field validator.FieldLevel) bool {
+	value, _, _, ok := field.GetStructFieldOK2()
+
+	if !ok {
+		panic("field not found")
+	}
+
+	firstValue := strings.ToUpper(field.Field().String())
+	secondValue := strings.ToUpper(value.String())
+
+	return firstValue == secondValue
+}
+
+func TestCrossValidation(t *testing.T) {
+	validate := validator.New()
+	validate.RegisterValidation("field_equals_ignore_case", MustEqualIgnoreCase)
+
+	type User struct {
+		Username string `validate:"required,field_equals_ignore_case=Email|field_equals_ignore_case=Phone"`
+		Email    string `validate:"required,email"`
+		Phone    string `validate:"required,numeric"`
+		Name     string `validate:"required"`
+	}
+
+	user := User{
+		Username: "canonflow1@gmail.com",
+		Email:    "CanonFlow@gmail.com",
+		Phone:    "081234567890",
+		Name:     "Canonflow",
+	}
+
+	err := validate.Struct(user)
+	if err != nil {
+		fmt.Println(err.Error())
+		// Key: 'User.Username' Error:Field validation for 'Username' failed on the 'field_equals_ignore_case=Email|field_equals_ignore_case=Phone' tag
+	}
+}
