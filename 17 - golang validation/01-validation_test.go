@@ -51,3 +51,19 @@ func TestValidationTwoVariables(t *testing.T) {
 		PASS
 	*/
 }
+
+func TestMultipleTag(t *testing.T) {
+	validate := validator.New()
+
+	user := "1234"
+
+	err := validate.Var(user, "required,numeric")
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	/*
+		=== RUN   TestMultipleTag
+		--- PASS: TestMultipleTag (0.00s)
+	*/
+}
