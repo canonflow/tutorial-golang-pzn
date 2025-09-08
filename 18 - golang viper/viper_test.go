@@ -83,3 +83,26 @@ func TestEnv(t *testing.T) {
 		PASS
 	*/
 }
+
+func TestEnvVariable(t *testing.T) {
+	config := viper.New()
+	config.SetConfigFile("config.env")
+	config.AddConfigPath(".")
+	config.AutomaticEnv()
+
+	// Membaca
+	err := config.ReadInConfig()
+	assert.Nil(t, err)
+	assert.Equal(t, "golang-viper", config.GetString("APP_NAME"))
+	assert.Equal(t, "Nathan Garzya", config.GetString("APP_AUTHOR"))
+	assert.Equal(t, 3306, config.GetInt("DATABASE_PORT"))
+	assert.True(t, config.GetBool("DATABASE_SHOW_SQL"))
+
+	// export FROM_ENV=Hello
+	assert.Equal(t, "Hello", config.GetString("FROM_ENV"))
+	/*
+		$ go test
+		PASS
+		ok      golang-viper    0.207s
+	*/
+}

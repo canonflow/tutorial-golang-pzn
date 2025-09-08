@@ -111,3 +111,11 @@ DATABASE_HOST=localhost
 DATABASE_PORT=3306
 DATABASE_SHOW_SQL=true
 ```
+
+---
+
+## Environment Variable
+
+- Kadang **saat menjalankan aplikasi**, kita **menyimpan konfigurasi** menggunakna `environment` variable yang terdapat di **sistem operasi yang kita gunakan**.
+- Secara **default**, Viper **tidak akan membaca** data dari environment variable.
+- Namun **jika mau**, kita bisa menggunakan method `AutomaticEnv()` **untuk membaca** dari environment variable.
