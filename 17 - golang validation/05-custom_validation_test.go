@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"regexp"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -42,5 +44,44 @@ func TestCustomValidation(t *testing.T) {
 	if err != nil {
 		fmt.Println(err.Error())
 		// Key: 'LoginRequest.Username' Error:Field validation for 'Username' failed on the 'username' tag
+	}
+}
+
+var regexNumber = regexp.MustCompile("^[0-9]+$")
+
+func MustValidPin(field validator.FieldLevel) bool {
+	length, err := strconv.Atoi(field.Param())
+	if err != nil {
+		panic(err)
+	}
+
+	value := field.Field().String()
+	// Memastikan hanya angka
+	if !regexNumber.MatchString(value) {
+		return false
+	}
+
+	// Memastikan panjang sesuai
+	return len(value) == length
+}
+
+func TestCustomValidationWithParameter(t *testing.T) {
+	validate := validator.New()
+	validate.RegisterValidation("pin", MustValidPin)
+
+	type LoginRequest struct {
+		Phone string `validate:"required,number"`
+		Pin   string `validate:"required,pin=6"`
+	}
+
+	loginRequest := LoginRequest{
+		Phone: "081234567890",
+		Pin:   "12345",
+	}
+
+	err := validate.Struct(loginRequest)
+	if err != nil {
+		fmt.Println(err.Error())
+		// Key: 'LoginRequest.Pin' Error:Field validation for 'Pin' failed on the 'pin' tag
 	}
 }
