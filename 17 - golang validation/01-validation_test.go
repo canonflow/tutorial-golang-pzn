@@ -67,3 +67,20 @@ func TestMultipleTag(t *testing.T) {
 		--- PASS: TestMultipleTag (0.00s)
 	*/
 }
+
+func TestTagParameter(t *testing.T) {
+	validate := validator.New()
+
+	user := "99999"
+
+	err := validate.Var(user, "numeric,min=5,max=10")
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	/*
+		=== RUN   TestTagParameter
+		--- PASS: TestTagParameter (0.00s)
+		PASS
+	*/
+}
