@@ -6,11 +6,25 @@
 - Hal ini dikarenakan, tiap tempat untuk menjalankan aplikasi yang kita buat mungkin akan **berbeda** konfigurasinya, misal di komputer kita, di server atau di komputer orang lain.
 - Artinya, aplikasi yang kita buat, perlu memiliki kemampuan untuk mengambil data konfigurasi dari luar aplikasi, agar isi konfigurasi bisa diubah - ubah secara dinamis.
 
-
 ### Golang Viper
+
 - Golang Viper salah satu library yg populer untuk melakukan manajemen konfigurasi, seperti:
   - JSON
   - YAML
   - env file
   - properties
 
+---
+
+## Membuat Viper
+
+- Untuk membuat Viper, kita bisa menggunakan function `viper.New()`.
+- Setelah membuat Viper, kita bisa menentukan **dari mana** kita akan mengambil konfigurasi.
+
+### kode: Membuat Viper
+```go
+func TestViper(t *testing.T) {
+    var config *viper.Viper = viper.New()
+    assert.NotNil(t, config)
+}
+```
