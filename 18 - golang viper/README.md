@@ -72,3 +72,23 @@ func TestJson(t *testing.T) {
 
 - Untuk **mengambil value** yang sudah dibaca dari file yang kita tentukan, kita bisa menggunakan method `GetXxx`, sesuai dengan tipe datanya, misal `GetString`, `GetInt`, `GetBool`, dan lain-lain.
 - Jika kita ingin **mengakses nested object** pada `JSON`, kita bisa menggunakan `.`(titik), misal: `app.name`, `database.host`.
+
+---
+
+## YAML
+
+- Selain JSON, Viper juga bisa digunakan untuk membaca file dengan formal `YAML`.
+- Cara penggunaanya sama seperti ketika menggunakan `JSON`.
+
+### Kode: Config YAML
+
+```yaml
+app:
+  name: "golang-viper"
+  version: "1.0.0"
+  author: "Nathan Garzya"
+database:
+  show_sql: true
+  host: "localhost"
+  port: 3306
+```
