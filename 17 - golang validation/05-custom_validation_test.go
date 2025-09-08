@@ -85,3 +85,23 @@ func TestCustomValidationWithParameter(t *testing.T) {
 		// Key: 'LoginRequest.Pin' Error:Field validation for 'Pin' failed on the 'pin' tag
 	}
 }
+
+func TestOrRule(t *testing.T) {
+	validate := validator.New()
+
+	type Login struct {
+		Username string `validate:"email|numeric"`
+		Password string `validate:"required"`
+	}
+
+	login := Login{
+		Username: "canonflow",
+		Password: "rahasia",
+	}
+
+	err := validate.Struct(login)
+	if err != nil {
+		fmt.Println(err.Error())
+		// Key: 'Login.Username' Error:Field validation for 'Username' failed on the 'email|numeric' tag
+	}
+}
