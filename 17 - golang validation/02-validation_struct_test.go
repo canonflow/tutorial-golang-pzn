@@ -55,3 +55,31 @@ func TestValidationError(t *testing.T) {
 		}
 	}
 }
+
+type RegisterRequest struct {
+	Username        string `validate:"required,email"`
+	Password        string `validate:"required,min=5"`
+	ConfirmPassword string `validate:"required,eqfield=Password"`
+}
+
+func TestValidationCrossField(t *testing.T) {
+	validate := validator.New()
+
+	registerRequest := RegisterRequest{
+		Username:        "Nathan@gmail.com",
+		Password:        "12345",
+		ConfirmPassword: "12345",
+	}
+
+	err := validate.Struct(registerRequest)
+	if err != nil {
+		fmt.Println(err.Error())
+		// Key: 'RegisterRequest.ConfirmPassword' Error:Field validation for 'ConfirmPassword' failed on the 'eqfield' tag
+	}
+
+	/*
+		=== RUN   TestValidationCrossField
+		--- PASS: TestValidationCrossField (0.00s)
+		PASS
+	*/
+}
