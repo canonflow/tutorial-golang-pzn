@@ -327,8 +327,8 @@ type User struct {
     Name string `validate:"required"`
     Addresses []Address  `validate:"required,dive"`
     Hobbies []string `validate:"dive,required,min=1"`
-    // dive pertama untuk Map, lalu keys ... endkeys untuk key dari map, dan dive terakhir untuk validasi struct School
-    Schools map[string]School `validate="dive,keys,required,min=2,endkeys,dive"`
+    // dive pertama untuk Map, lalu keys ... endkeys untuk key dari map, tidak perlu dive lagi diterakhir, struct School dapat otomatis dilakukan validasi
+    Schools map[string]School `validate="dive,keys,required,min=2,endkeys"`
 }
 ```
 
