@@ -34,3 +34,20 @@ func TestValidationVariable(t *testing.T) {
 		*/
 	}
 }
+
+func TestValidationTwoVariables(t *testing.T) {
+	validate := validator.New()
+	password := "rahasia"
+	confirmPassword := "rahasia"
+
+	err := validate.VarWithValue(password, confirmPassword, "eqfield")
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	/*
+		=== RUN   TestValidationTwoVariables
+		--- PASS: TestValidationTwoVariables (0.00s)
+		PASS
+	*/
+}
