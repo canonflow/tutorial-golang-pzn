@@ -92,3 +92,22 @@ database:
   host: "localhost"
   port: 3306
 ```
+
+---
+
+## ENV
+
+- Viper juga bisa digunakan untuk membaca file dengan format `.env`.
+- Di beberapa framework, kadang banyak yang menggunakan format ini.
+
+### Kode: Config ENV
+
+```env
+APP_NAME=golang-viper
+APP_VERSION=1.0.0
+APP_AUTHOR=Nathan Garzya
+
+DATABASE_HOST=localhost
+DATABASE_PORT=3306
+DATABASE_SHOW_SQL=true
+```

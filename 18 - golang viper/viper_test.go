@@ -61,3 +61,25 @@ func TestYaml(t *testing.T) {
 		PASS
 	*/
 }
+
+func TestEnv(t *testing.T) {
+	config := viper.New()
+	// config.SetConfigName("config")
+	// config.SetConfigType("yaml")
+	config.SetConfigFile("config.env")
+	config.AddConfigPath(".")
+
+	// Membaca
+	err := config.ReadInConfig()
+	assert.Nil(t, err)
+	assert.Equal(t, "golang-viper", config.GetString("APP_NAME"))
+	assert.Equal(t, "Nathan Garzya", config.GetString("APP_AUTHOR"))
+	assert.Equal(t, 3306, config.GetInt("DATABASE_PORT"))
+	assert.True(t, config.GetBool("DATABASE_SHOW_SQL"))
+
+	/*
+		=== RUN   TestEnv
+		--- PASS: TestEnv (0.00s)
+		PASS
+	*/
+}
