@@ -32,3 +32,26 @@ func TestValidationStruct(t *testing.T) {
 		PASS
 	*/
 }
+
+func TestValidationError(t *testing.T) {
+	validate := validator.New()
+
+	loginRequest := LoginRequest{
+		Username: "nathan",
+		Password: "abc",
+	}
+
+	err := validate.Struct(loginRequest)
+	if err != nil {
+		validationErrors := err.(validator.ValidationErrors)
+
+		for _, fieldError := range validationErrors {
+			fmt.Println("Field:", fieldError.Field(), "Tag:", fieldError.Tag(), "Value:", fieldError.Value(), "Error:", fieldError.Error())
+
+			/*
+				Field: Username Tag: email Value: nathan Error: Key: 'LoginRequest.Username' Error:Field validation for 'Username' failed on the 'email' tag
+				Field: Password Tag: min Value: abc Error: Key: 'LoginRequest.Password' Error:Field validation for 'Password' failed on the 'min' tag
+			*/
+		}
+	}
+}
