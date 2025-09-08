@@ -327,7 +327,7 @@ type User struct {
     Name string `validate:"required"`
     Addresses []Address  `validate:"required,dive"`
     Hobbies []string `validate:"dive,required,min=1"`
-    // dive pertama untuk Map, lalu keys ... endkeys untuk key dari map, tidak perlu dive lagi diterakhir, struct School dapat otomatis dilakukan validasi
+    // dive pertama untuk Map, lalu keys ... endkeys untuk key dari map, tidak perlu dive lagi diterakhir, struct School dapat otomatis dilakukan validasi (udh ada Dive di awal sendiri)
     Schools map[string]School `validate="dive,keys,required,min=2,endkeys"`
 }
 ```
@@ -352,8 +352,8 @@ type User struct {
     Addresses []Address  `validate:"required,dive"`
     // validasi setelah dive digunakan untuk memvalidasi 'string'
     Hobbies []string `validate:"dive,required,min=1"`
-    // dive pertama untuk Map, lalu keys ... endkeys untuk key dari map, dan dive terakhir untuk validasi struct School
-    Schools map[string]School `validate="dive,keys,required,min=2,endkeys,dive"`
+    // dive pertama untuk Map, lalu keys ... endkeys untuk key dari map, tidak perlu dive lagi diterakhir, struct School dapat otomatis dilakukan validasi (udh ada Dive di awal sendiri)
+    Schools map[string]School `validate="dive,keys,required,min=2,endkeys"`
     // dive pertama untuk Map, lalu keys ... endkeys untuk key dari map, dan validasi setelah endkeys digunakan untuk memvalidasi 'value'
     Wallet map[string]int `validate="dive,keys,required,endkeys,required,gt=0"`
 }
