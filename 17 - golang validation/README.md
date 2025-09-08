@@ -558,7 +558,7 @@ type RegisterRequest struct {
 func MustValidRegisterSuccess(level validator.StructLevel) {
     registerRequest := level.Current().Interface().(RegisterRequest)
 
-    if registerRequest.Username == registerRequest.Email || registerRequest.Username == register.Request.Phone {
+    if registerRequest.Username == registerRequest.Email || registerRequest.Username == registerRequest.Phone {
         // success
     } else {
         // nilai yang salah, nama field di Struct, alias field (json), nama tag validator (di sini custom "username"), pesan tambahan (optional)
@@ -574,10 +574,10 @@ validate := validator.New()
 validate.RegisterStructValidation(MustValidRegisterSuccess, RegisterRequest{})
 
 registerRequest := RegisterRequest{
-    Username: "08123123123"
-    Email: "nathan@example.com"
-    Phone: "08123123123"
-    Password: "rahasia"
+    Username: "08123123123",
+    Email: "nathan@example.com",
+    Phone: "08123123123",
+    Password: "rahasia",
 }
 
 err := validate.Struct(registerRequest)

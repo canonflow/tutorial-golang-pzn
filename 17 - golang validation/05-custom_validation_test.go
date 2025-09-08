@@ -143,3 +143,39 @@ func TestCrossValidation(t *testing.T) {
 		// Key: 'User.Username' Error:Field validation for 'Username' failed on the 'field_equals_ignore_case=Email|field_equals_ignore_case=Phone' tag
 	}
 }
+
+type RegisterRequestNew struct {
+	Username string `validate:"required"`
+	Email    string `validate:"required,email"`
+	Phone    string `validate:"required,numeric"`
+	Password string `validate:"required"`
+}
+
+func MustValidRegisterSuccess(level validator.StructLevel) {
+	registerRequest := level.Current().Interface().(RegisterRequestNew)
+
+	if registerRequest.Username == registerRequest.Email || registerRequest.Username == registerRequest.Phone {
+		// success
+	} else {
+		// nilai yang salah, nama field di Struct, alias field (json), nama tag validator (di sini custom "username"), pesan tambahan (optional)
+		level.ReportError(registerRequest.Username, "Username", "Username", "username", "")
+	}
+}
+
+func TestStructLevelValidation(t *testing.T) {
+	validate := validator.New()
+	validate.RegisterStructValidation(MustValidRegisterSuccess, RegisterRequestNew{})
+
+	registerRequest := RegisterRequestNew{
+		Username: "081231231234",
+		Email:    "nathan@example.com",
+		Phone:    "08123123123",
+		Password: "rahasia",
+	}
+
+	err := validate.Struct(registerRequest)
+	if err != nil {
+		fmt.Println(err.Error())
+		// Key: 'RegisterRequestNew.Username' Error:Field validation for 'Username' failed on the 'username' tag
+	}
+}
