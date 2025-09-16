@@ -2,6 +2,7 @@ package main
 
 import (
 	"io"
+	"net/http"
 	"net/http/httptest"
 	"testing"
 
@@ -53,6 +54,31 @@ func TestCtx(t *testing.T) {
 	/*
 		=== RUN   TestCtx
 		--- PASS: TestCtx (0.00s)
+		PASS
+	*/
+}
+
+func TestHttpRequest(t *testing.T) {
+	app.Get("/request", func(ctx *fiber.Ctx) error {
+		first := ctx.Get("firstname")   // Header
+		last := ctx.Cookies("lastname") // Cookie
+		return ctx.SendString("Hello " + first + " " + last)
+	})
+
+	request := httptest.NewRequest("GET", "/request", nil)
+	request.Header.Set("firstname", "Nathan")
+	request.AddCookie(&http.Cookie{Name: "lastname", Value: "Garzya"})
+
+	response, err := app.Test(request)
+	assert.Nil(t, err)
+
+	bytes, err := io.ReadAll(response.Body)
+	assert.Nil(t, err)
+	assert.Equal(t, "Hello Nathan Garzya", string(bytes))
+
+	/*
+		=== RUN   TestHttpRequest
+		--- PASS: TestHttpRequest (0.00s)
 		PASS
 	*/
 }
