@@ -1,7 +1,10 @@
 package main
 
 import (
+	"bytes"
+	_ "embed"
 	"io"
+	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -129,6 +132,48 @@ func TestRequestForm(t *testing.T) {
 	/*
 		=== RUN   TestRequestForm
 		--- PASS: TestRequestForm (0.00s)
+		PASS
+	*/
+}
+
+//go:embed source/contoh.txt
+var contohFile []byte
+
+func TestMultipartForm(t *testing.T) {
+	app.Post("/upload", func(c *fiber.Ctx) error {
+		file, err := c.FormFile("file") // Get the file
+		if err != nil {
+			return err
+		}
+
+		err = c.SaveFile(file, "./target/"+file.Filename) // Save the file
+		if err != nil {
+			return err
+		}
+
+		return c.SendString("Upload Success")
+	})
+
+	// Setup Body
+	body := new(bytes.Buffer)
+	writer := multipart.NewWriter(body)                    // Init the writer -> put the content into body
+	file, _ := writer.CreateFormFile("file", "contoh.txt") // Create the Form File
+	file.Write(contohFile)                                 // Put the file into Form File
+	writer.Close()
+
+	request := httptest.NewRequest("POST", "/upload", body)
+	request.Header.Set("Content-Type", writer.FormDataContentType())
+
+	response, err := app.Test(request)
+	assert.Nil(t, err)
+
+	bytes, err := io.ReadAll(response.Body)
+	assert.Nil(t, err)
+	assert.Equal(t, "Upload Success", string(bytes))
+
+	/*
+		=== RUN   TestMultipartForm
+		--- PASS: TestMultipartForm (0.00s)
 		PASS
 	*/
 }
