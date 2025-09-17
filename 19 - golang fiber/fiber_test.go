@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/template/mustache/v2"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -38,7 +39,10 @@ func TestRoutingHello(t *testing.T) {
 	*/
 }
 
+var engine = mustache.New("./templates", ".mustache")
+
 var app = fiber.New(fiber.Config{
+	Views: engine,
 	ErrorHandler: func(c *fiber.Ctx, err error) error {
 		c.Status(fiber.StatusInternalServerError)
 		return c.SendString("Error : " + err.Error())
