@@ -149,3 +149,26 @@ func TestResponseJSON(t *testing.T) {
 		PASS
 	*/
 }
+
+func TestDownloadFile(t *testing.T) {
+	app.Get("/download", func(c *fiber.Ctx) error {
+		return c.Download("./source/contoh.txt", "contoh.txt")
+	})
+
+	request := httptest.NewRequest("GET", "/download", nil)
+
+	response, err := app.Test(request)
+	assert.Nil(t, err)
+	assert.Equal(t, 200, response.StatusCode)
+	assert.Equal(t, "attachment; filename=\"contoh.txt\"", response.Header.Get("Content-Disposition"))
+
+	bytes, err := io.ReadAll(response.Body)
+	assert.Nil(t, err)
+	assert.Equal(t, "INI CONTOH FILE YANG AKAN DIUPLOAD YA!!", string(bytes))
+
+	/*
+		=== RUN   TestDownloadFile
+		--- PASS: TestDownloadFile (0.04s)
+		PASS
+	*/
+}
