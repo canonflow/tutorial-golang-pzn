@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http/httptest"
 	"strings"
@@ -169,6 +170,29 @@ func TestDownloadFile(t *testing.T) {
 	/*
 		=== RUN   TestDownloadFile
 		--- PASS: TestDownloadFile (0.04s)
+		PASS
+	*/
+}
+
+func TestErrorHandling(t *testing.T) {
+	app.Get("/error", func(c *fiber.Ctx) error {
+		return errors.New("UUPSS")
+	})
+
+	request := httptest.NewRequest("GET", "/error", nil)
+
+	response, err := app.Test(request)
+
+	assert.Nil(t, err)
+	assert.Equal(t, 500, response.StatusCode)
+
+	bytes, err := io.ReadAll(response.Body)
+	assert.Nil(t, err)
+	assert.Equal(t, "Error : UUPSS", string(bytes))
+
+	/*
+		=== RUN   TestErrorHandling
+		--- PASS: TestErrorHandling (0.00s)
 		PASS
 	*/
 }

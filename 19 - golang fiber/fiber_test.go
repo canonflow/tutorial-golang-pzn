@@ -38,7 +38,12 @@ func TestRoutingHello(t *testing.T) {
 	*/
 }
 
-var app = fiber.New()
+var app = fiber.New(fiber.Config{
+	ErrorHandler: func(c *fiber.Ctx, err error) error {
+		c.Status(fiber.StatusInternalServerError)
+		return c.SendString("Error : " + err.Error())
+	},
+})
 
 func TestCtx(t *testing.T) {
 	app.Get("/", func(ctx *fiber.Ctx) error {
