@@ -286,3 +286,38 @@ func (u *User) TableName() string {
 - `UpdatedAt` akan selalu diubah menjadi `time.Now()` ketika diupdate datanya.
 - jika kita ingin mengubah nilai field-nya, kita bisa tambahkan `gorm:"autoCreateTime:true"` untuk `CreatedAt`.
 - Dan menggunakan `gorm:"autoUpdateTime:True"` untuk `UpdatedAt`.
+
+---
+
+## Field Permission
+
+- Secara **default**, semua field di struct Model **akan dianggap** kolom di tabel.
+- Dan **semua perubahan di field**, akan **diupdate** ke tabel di database.
+- Namun, kadang - kadang mungkin **kita ingin membuat field** yang **tidak merepresentasikan kolom di tabel** sehingga **tidak perlu** di `create` / `update`.
+- Atau **mungkin terdapat kolom** yang **tidak perlu diupdate** lagi.
+- Untuk mendukung kasus seperti itu, GORM menyediakan **Field Permission** menggunakan tag `gorm`.
+
+### GORM Field Permission
+
+| Tag  | Keterangan                                                                                                        |
+| :--: | :---------------------------------------------------------------------------------------------------------------- |
+| `<-` | **WRITE PERMISSION**, `<-:create` untuk create only, `<-:update` untuk update only, `<-` untuk create dan update. |
+| `->` | **READ PERMISSION**, `->:false` untuk no read permission.                                                         |
+| `-`  | **Ignore field ini**, tidak ada `write` / `read` permission.                                                      |
+
+### Kode: User Entity
+
+```go
+type User struct {
+    ID string `gorm:"primaryKey;column:id;<-:create"`
+    Password string `gorm:"column:password"`
+    Name string `gorm:"name"`
+    CreatedAt time.Time `gorm:"created_at;autoCreateTime;<-:create"`
+    UpdatedAt time.Time `gorm:"updated_at;autoCreateTime;autoUpdateTime"`
+    Information string `gorm:"-"`
+}
+
+func (u *User) TableName() string {
+    return "users"
+}
+```
