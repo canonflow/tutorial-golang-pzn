@@ -425,3 +425,10 @@ func TestBatchInsert(t *testing.T) {
     assert.Equal(t, 8, int(result.RowsAffected))
 }
 ```
+
+---
+
+## Logger
+
+- **Secara Default**, **informasi** perintah SQL yang dieksekusi oleh GORM **tidak akan di-log**.
+- Kita bisa mengubah level log dari GORM menggunakan `gorm.Config` ketika membuat koneksi database.
