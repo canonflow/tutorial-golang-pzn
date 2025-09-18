@@ -377,6 +377,7 @@ func TestUpdate(t *testing.T) {
 }
 
 func TestSelectedColumns(t *testing.T) {
+	// Update selected columns only with map
 	result := db.Model(&User{}).Where("id = ?", "1").
 		Updates(map[string]interface{}{
 			"middle_name": "",
@@ -385,11 +386,13 @@ func TestSelectedColumns(t *testing.T) {
 
 	assert.Nil(t, result.Error)
 
+	// Update selected column
 	result = db.Model(&User{}).Where("id = ?", "1").
 		Update("password", "ubahlagi")
 
 	assert.Nil(t, result.Error)
 
+	// Update selected columns only with struct (model)
 	result = db.Where("id = ?", "1").
 		Updates(User{
 			Name: Name{

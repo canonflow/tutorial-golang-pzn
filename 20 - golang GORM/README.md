@@ -851,3 +851,62 @@ func TestSelectedColumns(t *testing.T) {
     assert.Nil(t, result.Error)
 }
 ```
+
+---
+
+## Auto Increment
+
+- Salah satu fitur yang biasa ada di database adalah **Auto Increment** untuk Primary Key.
+- Contoh di MySQL ada `AUTO_INCREMENT` atau di PostgreSQL ada `SERIAL`.
+- GORM mendukung pembuatan `ID` yang **Auto Increment** dan **secara otomatis akan melakukan query data ID** setelah `Create()` datanya, sehingga tidak perlu melakukan query manual lagi.
+- Untuk memberitahu bahwa field adalah auto increment, kita harus gunakan tag `gorm:"autoIncremet"`
+
+### Kode: Tabel user_logs
+
+```sql
+create table user_logs
+(
+    id int auto_increment,
+    user_id varchar(100) not null,
+    action varchar(100) not null,
+    created_at timestamp not null default current_timestamp,
+    updated_at timestamp not null default current_timestamp on update current_timestamp,
+    primary key (id)
+) engine = InnoDB;
+```
+
+### Kode: UserLog Model
+
+```go
+import "time"
+
+type UserLog struct {
+    ID int `gorm:"primaryKey;column:id;autoIncrement"`
+    UserID string `gorm:"column:user_id"`
+    Action string `gorm:"column:action"`
+    CreatedAt time.Time `gorm:"column:created_at;autoCreateTime"`
+    UpdatedAt time.Time `gorm:"column:updated_at;autoCreateTime;autoUpdateTime"`
+}
+
+func (u *UserLog) TableName() string {
+    return "user_logs"
+}
+```
+
+### Kode: Insert User Log
+
+```go
+func TestAutoIncrement(t *testing.T) {
+    for i := 0; i < 10; i++ {
+        userLog := UserLog{
+            UserID: "1",
+            Action: "Test Action",
+        }
+
+        result := db.Create(&userLog)
+        assert.Nil(t, result.Error)
+        assert.NotEqual(t, 0, userLog.ID)
+        fmt.Println(userLog.ID)
+    }
+}
+```
