@@ -334,3 +334,25 @@ func TestOrderLimitOffset(t *testing.T) {
 		PASS
 	*/
 }
+
+type UserResponse struct {
+	ID        string
+	FirstName string
+	LastName  string
+}
+
+func TestQueryNonModel(t *testing.T) {
+	var users []UserResponse
+
+	result := db.Model(&User{}).Select("id", "first_name", "last_name").
+		Find(&users)
+
+	assert.Nil(t, result.Error)
+	assert.Equal(t, 15, len(users))
+
+	/*
+		=== RUN   TestQueryNonModel
+		--- PASS: TestQueryNonModel (0.00s)
+		PASS
+	*/
+}

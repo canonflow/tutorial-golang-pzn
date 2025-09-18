@@ -761,3 +761,33 @@ func TestOrderLimitOffset(t *testing.T) {
     assert.Equal(t, "14", users[0].ID)
 }
 ```
+
+---
+
+## Query Non Model
+
+- Saat kita menggunakan `First()`, `Take()`, `Last()`, dan `Find()`, GORM **melihat struktur** tabel **ke Model** yang kita gunakan.
+- Namun GORM memiliki fitur untuk **menyimpan data ke data yang bukan model**.
+  - Contoh, kita hanya ingin melakukan query `first_name` dan `last_name` saja di tabel `users` misalnya. Kita **bisa membuat struct berbeda** dibanding menggunakan model User.
+- Jika kita ingin melakukan hal ini, **GORM tetap harus tahu**, Model mana yang digunakan.
+  - Caranya adalah kita bisa menggunakan method `Model()` untuk **menentukan Model yang digunakan**.
+
+### Kode: Query Non Model
+
+```go
+type UserResponse struct {
+    ID string
+    FirstName string
+    LastName string
+}
+
+func TestQueryNonModel(t *testing.T) {
+    var users []UserResponse
+
+    result := db.Model(&User{}).Select("id", "first_name", "last_name").
+        Find(&users)
+
+    assert.Nil(t, result.Error)
+    assert.Equal(t, 15, len(users))
+}
+```
