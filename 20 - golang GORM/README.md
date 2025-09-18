@@ -613,6 +613,151 @@ func TestQueryAllObjects(t *testing.T) {
 }
 ```
 
-## Query Condition
+---
 
-- test
+## Advance Query
+
+### Query Condition
+
+- Sebelumnya kita sudah bisa menggunakan `Inline Condition` ketika melakukan query.
+- Selain menggunakan `Inline Condition`, kita juga bisa menggunakan method `Where()` untuk mengubah kondisi query yang akan kita buat.
+
+### Kode: Query Condition
+
+```go
+func TestQueryCondition(t *testing.T) {
+    var users []User
+
+    result := db.Where("first_name LIKE ?", "%User%").
+        Where("password = ?", "rahasia").
+        Find(&users)
+
+    assert.Nil(t, result.Error)
+    assert.Equal(t, 15, len(users))
+}
+```
+
+### Or Condition
+
+- Secara default saat kita menggunakan `Where()`, kondisi akan digabungkan menggunakan **AND** operator.
+- Jika kita ingin menggunakan **OR** operator, kita bisa menggunakan method `Or()`.
+
+### Kode: Or Condition
+
+```go
+func TestOrCondition(t *testing.T) {
+    var users []User
+
+    result := db.Where("first_name LIKE ?", "%User%").
+        Or("password = ?", "rahasia").
+        Find(&users)
+
+    assert.Nil(t, result.Error)
+    assert.Equal(t, 15, len(users))
+}
+```
+
+### Not Condition
+
+- Dan jika kita ingin menggunakan `NOT` operator, kita bisa gunakan method `Not()`.
+
+### Kode: Not Condition
+
+```go
+func TestNotCondition(t *testing.T) {
+    var users []User
+
+    result := db.Not("first_name LIKE ?", "%User%").
+        Where("password = ?", "rahasia").
+        Find(&users)
+
+    assert.Nil(t, result.Error)
+    assert.Equal(t, 0, len(users))
+}
+```
+
+### Select Fields
+
+- Secara default, semua kolom akan di-select dan dimasukkan ke field Model.
+- Jika misal kita ingin menentukan kolom apa saja yang mau di-select, kita bisa menggunakan method `Select(columns)`.
+
+### Kode: Select Fields
+
+```go
+func TestSelectFields(t *testing.T) {
+    var users []User
+
+    result := db.Select("id", "first_name").Find(&users)
+    assert.Nil(t, result.Error)
+
+    for _, user := range users {
+        assert.NotNil(t, user.ID)
+        assert.Equal(t, "", user.Name.FirstName)
+    }
+
+    assert.Equal(t, 15, len(users))
+}
+```
+
+### Struct and Map Condition
+
+- Saat kita menggunakan `Where()`, `Not()`, atau `Or()`, kita juga bisa menggunakan parameter `Struct` atau `Map`.
+- Secara otomatis, `field` atau `key` akan **dijadikan kolom query**, dan `value` akan **dijadikan value query**.
+- Ini cocok ketika pada kasus kita butuh query yang dinamis, sehingga kolom yang dicari bisa berbeda - beda sesuai kondisi pencarian.
+
+### Kode: Struct Condition
+
+```go
+func TestStructCondition(t *testing.T) {
+    userCondition := User{
+        Name: Name{
+            FirstName: "User 5",
+        },
+    }
+
+    var users []User
+
+    result := db.Where(userCondition).Find(&users)
+
+    assert.Nil(t, result.Error)
+    assert.Equal(t, 1, len(users))
+}
+```
+
+### Kode: Map Condition
+
+```go
+func TestMapCondition(t *testing.T) {
+    mapCondition  := map[string]interface{}{
+        "middle_name": "",
+    }
+
+    var users []User
+    result := db.Where(mapCondition).Find(&users)
+
+    assert.Nil(t, result.Error)
+    assert.Equal(t, 15, len(users))
+}
+```
+
+### Order, Limit, dan Offset
+
+- Untuk melakukan **sorting**, kita juga bisa menggunakan method `Order()`.
+- Dan untuk melakukan **paging**, kita bisa menggunakan method `Limit()` dan `Offset()`.
+
+### Kode: Order, Limit, dan Offset
+
+```go
+func TestOrderLimitOffset(t *testing.T) {
+    var users []User
+
+    result := db.Order("id asc, first_name asc").
+        Limit(5).
+        Offset(5).
+        Find(&users)
+
+    assert.Nil(t, result.Error)
+    assert.Equal(t, 5, len(users))
+    assert.Equal(t, "14", users[0].ID)
+}
+```
