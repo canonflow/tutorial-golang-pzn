@@ -89,3 +89,27 @@ func TestConflict(t *testing.T) {
 		PASS
 	*/
 }
+
+func TestDelete(t *testing.T) {
+	var user User
+	// Pakai model yang sudah ada ID-nya
+	result := db.First(&user, "id = ?", "88")
+	assert.Nil(t, result.Error)
+
+	result = db.Delete(&user)
+	assert.Nil(t, result.Error)
+
+	// Pakai model, ambil id -> langsung delete (pakai inline where)
+	result = db.Delete(&User{}, "id = ?", "99")
+	assert.Nil(t, result.Error)
+
+	// Pakai where method -> lalu pass strut User (untuk memberi tahu table apa yang dipakai)
+	result = db.Where("id = ?", "15").Delete(&User{})
+	assert.Nil(t, result.Error)
+
+	/*
+		=== RUN   TestDelete
+		--- PASS: TestDelete (0.00s)
+		PASS
+	*/
+}
