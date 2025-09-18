@@ -1080,3 +1080,107 @@ func TestDelete(t *testing.T) {
     assert.Nil(t, result.Error)
 }
 ```
+
+---
+
+## Soft Delete
+
+- Soft Delete adalah salah satu prakter yang sering dilakukan ketika membuat aplikasi.
+- Soft Delete merupakan praktek **menghapus data**, **tanpa menghapus** data dari database.
+- Praktek ini **membuat satu kolom** biasanya berupa tipe data `timestamp` yang **berisi waktu dihapus**.
+- Jika kolom tersebut **berisi data**, otomatis data tersebut **dianggap sudah di-delete**.
+
+### GORM Soft Delete
+
+- GORM mendukung fitur **Soft Delete secara otomatis**, caranya **kita cukup membuat field** `DeletedAt` dengan tipe `gorm.DeletedAt` (**alias untuk time.Time**).
+- Jika GORM **mendeteksi terdapat field** dengan nama `DeletedAt`, **secara otomatis** GORM akan melakukan **Soft Delete**.
+- Selain itu, **ketika melakukan query**, secara **otomatis** juga GORM akan **menambahkan filter** Soft Delete yang artinya hasil query hanya **data yang belum di-delete**.
+
+### Kode: Table Todo
+
+```sql
+create table todos
+(
+    id bigint not null auto_increment,
+    user_id varchar(100) not null,
+    title varchar(100) not null,
+    description text null,
+    created_at timestamp not null default current_timestamp,
+    updated_at timestamp not null default current_timestamp on update current_timestamp,
+    deleted_at timestamp null,
+    primary key (id)
+) engine = InnoDB;
+```
+
+### Kode: Todo Model
+
+```go
+type Todo struct {
+    ID int64 `gorm:"primaryKey;column:id;autoIncrement"`
+    UserID string `gorm:"column:user_id"`
+    Title string `gorm:"column:title"`
+    Description string `gorm:"column:description"`
+    CreatedAt time.Time `gorm:"column:created_at;autoCreateTime"`
+    UpdatedAt time.Time `gorm:"column:updated_at;autoCreateTime;autoUpdateTime"`
+    DeletedAt gorm.DeletedAt `gorm:"column:deleted_at"`
+}
+
+func (t *Todo) TableName() string {
+    return "todos"
+}
+```
+
+### Kode: Delete Todo
+
+```go
+func TestSoftDelete(t *testing.T) {
+    todo := Todo{
+        UserID: "1",
+        Title: "Todo 1",
+        Description: "Isi Todo 1",
+    }
+
+    // create
+    result := db.Create(&todo)
+    assert.Nil(t, result.Error)
+
+    // delete
+    result = db.Delete(&todo)
+    assert.Nil(t, result.Error)
+    assert.NotNil(t, todo.DeletedAt)
+
+    var todos []Todo
+    result = db.Find(&todos)
+    assert.Nil(t, result.Error)
+    assert.Equal(t, 0, len(todos))
+}
+```
+
+### Unscoped
+
+- Ketika kita ingin mengambil data, **termasuk data yang sudah di-soft delete**, ktia bisa menggunakan method `Unscoped()`.
+- Method `Unscoped()` **juga bisa digunakan** jika kita benar-benar mau melakukan **hard delete** permanen di database.
+
+### Kode: Unscoped
+
+```go
+func TestUnscoped(t *testing.T) {
+    var todo Todo
+
+    result := db.Unscoped().First(&todo, "id = ?", "1")
+    assert.Nil(t, result.Error)
+
+    result = db.Unscoped().Delete(&todo)
+    assert.Nil(t, result.Error)
+
+    var todos []Todo
+    result = db.Unscoped().Find(&todos)
+    assert.Nil(t, result.Error)
+    assert.Equal(t, 0, len(todos))
+}
+```
+
+### Peringatan
+
+- Saat menggunakan **Soft Delete**, perhatikan penggunaan **Primary Key** atay **Unique Index**.
+- ketika **data sudah dihapus secara** **Soft Delete**, sebenarnya **data masih ada di table**. Oleh karena itu, pastikan data primary key atau unique index **tidak duplicate** dengan **data yang sudah dihapus** secara `soft delete`.
