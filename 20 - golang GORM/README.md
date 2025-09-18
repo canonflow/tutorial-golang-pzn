@@ -172,3 +172,82 @@ func TestScanRows(t *testing.T) {
     assert.Equal(t, 4, len(sample))
 }
 ```
+
+---
+
+## Model
+
+- Model atau Entity adalah `Struct` **representasi** dari table di database.
+- Saat kita membuat tabel di database, direkomendasikan dibuatkan struct representasinya.
+- Hal ini agar kita **tidak perlu** melakukan pembuatan perintah SQL **secara manual lagi**.
+
+### Kode: Tabel User
+
+```sql
+create table users (
+    id varchar(100) not null,
+    password varchar(100) not null,
+    name varchar(100) not null,
+    created_at timestamp not null default current_timestamp,
+    updated_at timestamp not null default current_timestamp on update current_timestamp,
+    primary key (id)
+) engine = InnoDB
+```
+
+### Kode: User Entity
+
+```go
+import "time"
+
+type User struct {
+    ID string
+    Password string
+    Name string
+    CreatedAt time.Time
+    UpdatedAt time.Time
+}
+```
+
+### Convention
+
+- Saat kita membuat struct, **secara default** GORM akan melakukan **mapping secara otomatis**, dimana:
+  - **nama tabel** akan dipilih dari **nama struc**t menggunakan **lower_case jamak**.
+  - **nama kolom** akan dipilih menggunakan **lower_case**.
+- Selain itu, **secara otomatis** GORM akan memilih **field ID** sebagai **Primary Key**.
+- Namun, sebenarnya **disarankan** kita **deklarasi secara manual** menggunakan `tag` dibanding secara otomatis.
+- [https://gorm.io/docs/models.html#Fields-Tags](https://gorm.io/docs/models.html#Fields-Tags)
+
+### Kode: User Entity dengan Tag
+
+```go
+type User struct {
+    ID string `gorm:"primaryKey;column:id"`
+    Password string `gorm:"column:password"`
+    Name string `gorm:"name"`
+    CreatedAt time.Time `gorm:"created_at;autoCreateTime"`
+    UpdatedAt time.Time `gorm:"updated_at;autoCreateTime;autoUpdateTime"`
+}
+```
+
+### Table Name
+
+- Secara default, nama table akan menggunakan **lower_case** dan **jamak**.
+- Misal struct `User` akan menggunakan table `users`.
+- Misal struct `OrderDetail` akan menggunakan table `order_details`.
+- Namun, jika kita ingin menggunakan manual nama tabel-nya, kita bisa menggunakan **interface Tabler**, yang **mewajibkan** membuat **method** dengan nama `TableName()`.
+
+### Kode: User Entity
+
+```go
+type User struct {
+    ID string `gorm:"primaryKey;column:id"`
+    Password string `gorm:"column:password"`
+    Name string `gorm:"name"`
+    CreatedAt time.Time `gorm:"created_at;autoCreateTime"`
+    UpdatedAt time.Time `gorm:"updated_at;autoCreateTime;autoUpdateTime"`
+}
+
+func (u *User) TableName() string {
+    return "users"
+}
+```
