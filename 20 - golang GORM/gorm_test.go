@@ -356,3 +356,53 @@ func TestQueryNonModel(t *testing.T) {
 		PASS
 	*/
 }
+
+func TestUpdate(t *testing.T) {
+	user := User{}
+	result := db.First(&user, "id = ?", "1")
+	assert.Nil(t, result.Error)
+
+	user.Name.FirstName = "Nathan"
+	user.Name.MiddleName = "Garzya"
+	user.Name.LastName = "Santoso"
+	user.Password = "password123"
+
+	result = db.Save(&user)
+
+	/*
+		=== RUN TestUpdate
+		--- PASS: TestUpdate (0.00s)
+		PASS
+	*/
+}
+
+func TestSelectedColumns(t *testing.T) {
+	result := db.Model(&User{}).Where("id = ?", "1").
+		Updates(map[string]interface{}{
+			"middle_name": "",
+			"last_name":   "Morro",
+		})
+
+	assert.Nil(t, result.Error)
+
+	result = db.Model(&User{}).Where("id = ?", "1").
+		Update("password", "ubahlagi")
+
+	assert.Nil(t, result.Error)
+
+	result = db.Where("id = ?", "1").
+		Updates(User{
+			Name: Name{
+				FirstName: "Nathan",
+				LastName:  "Santoso",
+			},
+		})
+
+	assert.Nil(t, result.Error)
+
+	/*
+		--- PASS: TestSelectedColumns (0.00s)
+		=== RUN   TestSelectedColumns
+		PASS
+	*/
+}

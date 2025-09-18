@@ -791,3 +791,63 @@ func TestQueryNonModel(t *testing.T) {
     assert.Equal(t, 15, len(users))
 }
 ```
+
+---
+
+## Update
+
+- Untuk melakukan update data Model yang sudah kita modifikasi, kita bisa menggunakan method `Save()` di `gorm.DB`.
+- Secara otomatis semua kolom yang memang **memiliki permission untuk di-update**, akan di-update ke database.
+
+### Kode: Update
+
+```go
+func TestUpdate(t *testing.T) {
+    user := User{}
+    result := db.First(&user, "id = ?", "1")
+    assert.Nil(t, result.Error)
+
+    user.Name.FirstName := "Nathan"
+    user.Name.MiddleName := "Garzya"
+    user.Name.LastName := "Santoso"
+    user.Password := "password123"
+
+    result = db.Save(&user)
+    assert.Nil(result.Error)
+}
+```
+
+### Update Selected Column
+
+- **Secara default**, melakukan `Save()` untuk data Model, akan melakukan **update semua kolom walaupun tidak berubah**.
+- Jika kita ingin menentukan hanya **beberapa kolom yang ingin di-update**, kita bisa menggunakan method `Updates()`.
+- Atau menggunakan `Update(kolom, value)` jika hanya ingin melakukan update **satu kolom** saja.
+
+### Kode: Update Selected Column
+
+```go
+func TestSelectedColumns(t *testing.T) {
+    result := db.Model(&User{}).Where("id = ?", "1").
+        Updates(map[string]interface{}{
+            "middle_name": "",
+            "last_name": "Morro",
+        })
+
+    assert.Nil(t, result.Error)
+
+    result = db.Model(&User{}).Where("id = ?", "1").
+        Update("password", "ubahlagi")
+
+    assert.Nil(t, result.Error)
+
+    result = db.Where("id = ?", "1").
+        Updates(User{
+			Name: Name{
+				FirstName: "Nathan",
+				LastName:  "Santoso",
+			},
+		})
+
+    assert.Nil(t, result.Error)
+}
+```
