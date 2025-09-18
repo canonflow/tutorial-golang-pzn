@@ -368,3 +368,60 @@ func (u *User) TableName() string {
     return "users"
 }
 ```
+
+---
+
+## Create
+
+- Untuk **memasukkan** data ke database, kita **tidak perlu membuat** SQL Insert **secara manual**.
+- GORM bisa membaca data dari Model yang sudah kita buat, lalu **secara otomatis** akan membuatkan perintah SQL **sesuai dengan data Model** yang kita buat.
+- Kita bisa menggunakan method `Create()` pada `gorm.DB`.
+
+### Kode: Create
+
+```go
+func TestCreateUser(t *testing.T) {
+    user := User{
+        ID: "1",
+        Password: "rahasia",
+        Name: Name {
+            FirstName: "Nathan",
+            MiddleName: "Garzya",
+            LastName: "Santoso"
+        },
+        Information: "Ini akan di-ignore oleh GORM"
+    }
+
+    response := db.Create(&user)
+    assert.Nil(t, response.Error)
+    assert.Equal(t, 1, int(response.RowsAffected))
+}
+```
+
+### Batch Insert
+
+- Saat kita menggunakan `Create()` Method, maka tiap data akan dibuatkan SQL Insert.
+- Kadang ketika kita ingin **memasukkan banyak data** sekaligus, ada baiknya kita menggunakan sekali SQL Insert agar lebih efektif.
+- GORM mendukung hal ini menggunakan method `Create(slices)` atau jika ingin **menentukan jumlah data** per SQL Insert, kita bisa gunakan `CreateInBatches(slices, size)`.
+
+### Kode: Batch Insert
+
+```go
+func TestBatchInsert(t *testing.T) {
+    var users []User
+
+    for i := 2; i < 10; i++ {
+        users := append(users, User{
+            ID: strconv.Itoa(i),
+            Name: Name{
+                FirstName: "User " + strconv.Itoa(i),
+            },
+            Password: "rahasia"
+        })
+    }
+
+    result := db.Create(&users)
+    asset.Nil(t, result.Error)
+    assert.Equal(t, 8, int(result.RowsAffected))
+}
+```
