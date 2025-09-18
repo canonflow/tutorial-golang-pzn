@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"gorm.io/gorm"
 )
 
 func TestCreateUser(t *testing.T) {
@@ -55,6 +56,105 @@ func TestBatchInsert(t *testing.T) {
 	/*
 		=== RUN   TestBatchInsert
 		--- PASS: TestBatchInsert (0.01s)
+		PASS
+	*/
+}
+
+func TestTransaction(t *testing.T) {
+	err := db.Transaction(func(tx *gorm.DB) error {
+		err := tx.Create(&User{ID: "11", Password: "rahasia", Name: Name{FirstName: "User 11"}}).Error
+		if err != nil {
+			return err
+		}
+
+		err = tx.Create(&User{ID: "12", Password: "rahasia", Name: Name{FirstName: "User 12"}}).Error
+		if err != nil {
+			return err
+		}
+
+		err = tx.Create(&User{ID: "13", Password: "rahasia", Name: Name{FirstName: "User 13"}}).Error
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	assert.Nil(t, err)
+
+	/*
+		=== RUN   TestTransaction
+		--- PASS: TestTransaction (0.01s)
+		PASS
+	*/
+}
+
+func TestTransactionError(t *testing.T) {
+	err := db.Transaction(func(tx *gorm.DB) error {
+		err := tx.Create(&User{ID: "12", Password: "rahasia", Name: Name{FirstName: "User 12"}}).Error
+		if err != nil {
+			return err
+		}
+
+		err = tx.Create(&User{ID: "13", Password: "rahasia", Name: Name{FirstName: "User 13"}}).Error
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	assert.NotNil(t, err)
+
+	/*
+		=== RUN   TestTransactionError
+		--- PASS: TestTransactionError (0.00s)
+		PASS
+	*/
+}
+
+func TestManualTransactionSuccess(t *testing.T) {
+	tx := db.Begin()
+	defer tx.Rollback()
+
+	err := tx.Create(&User{ID: "14", Password: "rahasia", Name: Name{FirstName: "User 14"}}).Error
+
+	assert.Nil(t, err)
+
+	err = tx.Create(&User{ID: "15", Password: "rahasia", Name: Name{FirstName: "User 15"}}).Error
+
+	assert.Nil(t, err)
+
+	if err == nil {
+		tx.Commit()
+	}
+
+	/*
+		=== RUN   TestManualTransactionSuccess
+		--- PASS: TestManualTransactionSuccess (0.00s)
+		PASS
+	*/
+}
+
+func TestManualTransactionError(t *testing.T) {
+	tx := db.Begin()
+	defer tx.Rollback()
+
+	err := tx.Create(&User{ID: "16", Password: "rahasia", Name: Name{FirstName: "User 14"}}).Error
+
+	assert.Nil(t, err)
+
+	err = tx.Create(&User{ID: "15", Password: "rahasia", Name: Name{FirstName: "User 15"}}).Error
+
+	assert.NotNil(t, err)
+
+	if err == nil {
+		tx.Commit()
+	}
+
+	/*
+		=== RUN   TestManualTransactionError
+		--- PASS: TestManualTransactionError (0.00s)
 		PASS
 	*/
 }

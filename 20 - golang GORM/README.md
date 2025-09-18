@@ -432,3 +432,116 @@ func TestBatchInsert(t *testing.T) {
 
 - **Secara Default**, **informasi** perintah SQL yang dieksekusi oleh GORM **tidak akan di-log**.
 - Kita bisa mengubah level log dari GORM menggunakan `gorm.Config` ketika membuat koneksi database.
+
+---
+
+## Transaction
+
+- Transaction hanya bisa terjadi jika kita menggunakan Database Connection **yang sama**.
+- Saat kita **menggunakan Method** di `gorm.DB`, **bisa saja** tiap Method **akan menggunakan** Database Connection **yang berbeda**, karena `Connection Pool`-nya **diatur oleh GORM**.
+- Jika kita ingin melakukan `transaction`, kita bisa menggunakan method `Transaction(callback)`, dan di dalam function `callback` kita bisa buat semua kode transactionnya.
+
+### Kode: Transaction Success
+
+```go
+func TestTransaction(t *testing.T) {
+    err := db.Transaction(func(tx *gorm.DB) error {
+        err := tx.Create(&User{ID: "11", Password: "rahasia", Name: Name{FirstName: "User 11"} }).Error
+
+        if err != nil {
+            return err
+        }
+
+        err = tx.Create(&User{ID: "12", Password: "rahasia", Name: Name{FirstName: "User 12"} }).Error
+
+        if err != nil {
+            return err
+        }
+
+        err = tx.Create(&User{ID: "13", Password: "rahasia", Name: Name{FirstName: "User 13"} }).Error
+
+        if err != nil {
+            return err
+        }
+
+        return nil
+    })
+
+    assert.Nil(t, err)
+}
+```
+
+### Kode: Transaction Error
+
+```go
+func TestTransactionError(t *testing.T) {
+    err := db.Transaction(func(tx *gorm.DB) error {
+        err := tx.Create(&User{ID: "12", Password: "rahasia", Name: Name{FirstName: "User 12"} }).Error
+
+        if err != nil {
+            return err
+        }
+
+        err = tx.Create(&User{ID: "13", Password: "rahasia", Name: Name{FirstName: "User 13"} }).Error
+
+        if err != nil {
+            return err
+        }
+
+        return nil
+    })
+
+    assert.NotNil(t, err)
+}
+```
+
+### Manual Transaction
+
+- Selain menggunakan Method `Transaction(callback)`, kita juga bisa melakukan manajemen transaksi secara manual.
+- Kita bisa membuat object gorm.DB baru ketika menjalankan transaksi menggunakan method `Begin()`.
+- Ketika kita ingin melakukan `commit`, gunakan `Commit()`.
+- Ketika kita ingin melakukan `rollback`, gunakan `Rollback()`.
+
+### Kode: Manual Transaction Success
+
+```go
+
+func TestManualTransactionSuccess(t *testing.T) {
+    tx := db.Begin()
+    defer tx.Rollback()
+
+    err := tx.Create(&User{ID: "14", Password: "rahasia", Name: Name{FirstName: "User 14"} }).Error
+
+    assert.Nil(t, err)
+
+    err = tx.Create(&User{ID: "15", Password: "rahasia", Name: Name{FirstName: "User 15"} }).Error
+
+    assert.Nil(t, err)
+
+    if err == nil {
+        tx.Commit()
+    }
+}
+```
+
+### Kode: Manual Transaction Error
+
+```go
+
+func TestManualTransactionError(t *testing.T) {
+    tx := db.Begin()
+    defer tx.Rollback()
+
+    err := tx.Create(&User{ID: "16", Password: "rahasia", Name: Name{FirstName: "User 14"} }).Error
+
+    assert.Nil(t, err)
+
+    err = tx.Create(&User{ID: "15", Password: "rahasia", Name: Name{FirstName: "User 15"} }).Error
+
+    assert.NotNil(t, err)
+
+    if err == nil {
+        tx.Commit()
+    }
+}
+```
