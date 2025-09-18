@@ -251,3 +251,38 @@ func (u *User) TableName() string {
     return "users"
 }
 ```
+
+---
+
+## Model Conventions
+
+- Saat kita membuat struct untuk Model, jika kita **ingin mengikuti aturan** dari GORM, sebenarnya kita tidak perlu menggunakan `tag`.
+- Sekarang kita akan bahas beberapa convention yang digunakan oleh GORM.
+
+### ID Sebagai Primary Key
+
+- GORM secara default menggunakan **field** `ID` sbg **primary key**.
+- Jika kita membuat field `ID` di struct Model, secara default akan digunakan sbg primary key di tabel.
+- Jika kita ingin memilih field lain selain ID, maka kita harus menggunakan `tag` GORM `gorm:"primaryKey"`.
+
+### Table Name
+
+- GORM secara default akan menggunakan nama tabel dengan format `snake_cases` (**lowercase**, menggunakan `_` sebagai pemisah, dan dijadikan **jamak**).
+- Misal untuk struct `User`, secara default akan menggunakan nama tabel `users`.
+- Untuk struct `OrderDetail` secara default akan menggunakan nama tabel `order_details`.
+- Jika kita ingin **mengubah nama default tabel nya**, maka kita harus implementasi **interface Tabler** dengan menambahkan method `TableName()`.
+
+### Column Name
+
+- GORM secara default akan menggunakan **snake_case** untuk nama kolom dari struct Model yang kita buat.
+- Misal jika field `ID` artinya kolomnya id.
+- Jika field `FirstName` artinya kolomnya `first_name`.
+- Jika kita ingin mengubah nama kolom, kita bisa menggunakan tag `gorm:"column:nama_kolom"`.
+
+### Timestamp Tracking
+
+- GORM memiliki fitur `timestamp`, yaitu melakukan **perubahan otomatis** untuk **waktu dibuat** dan **diubah**-nya Model menggunakan field `CreatedAt` dan `UpdatedAt`.
+- `CreatedAt` dan `UpdatedAt` **secara default** akan menggunakan `time.Now()` ketika dibuat
+- `UpdatedAt` akan selalu diubah menjadi `time.Now()` ketika diupdate datanya.
+- jika kita ingin mengubah nilai field-nya, kita bisa tambahkan `gorm:"autoCreateTime:true"` untuk `CreatedAt`.
+- Dan menggunakan `gorm:"autoUpdateTime:True"` untuk `UpdatedAt`.
