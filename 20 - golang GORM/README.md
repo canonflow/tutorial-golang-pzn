@@ -55,3 +55,120 @@ func TestConnection(t *testing.T) {
     assert.NotNil(t, db)
 }
 ```
+
+---
+
+## Raw SQL
+
+- Raw SQL artinya membuat query SQL secara manual.
+- Terdapat **2 jenis** SQL, untuk melakukan Query (Select) atau untuk mengubah data (Insert, Update, Delete).
+- Untuk melakukan query, kita bisa menggunakan method `Raw(sql)` di `gorm.DB`.
+- Dan untuk melakukan manipulasi data, kita bisa gunakan method `Exec(sql)` di `gorm.DB`.
+
+### Kode: Table Sample
+
+```sql
+create table sample (
+    id varchar(100) not null,
+    name varchar(100) not null,
+    primary key (id)
+) engine = InnoDB
+```
+
+### Kode: Execute SQL
+
+```go
+func TestExecuteSQL(t *testing.T) {
+    err := db.Exec("insert into sample(id, name) values (?, ?)", "1", "nathan").Error
+
+    assert.Nil(t, err)
+
+    err = db.Exec("insert into sample(id, name) values (?, ?)", "2", "garzya").Error
+
+    assert.Nil(t, err)
+
+    err = db.Exec("insert into sample(id, name) values (?, ?)", "3", "santoso").Error
+
+    assert.Nil(t, err)
+
+    err = db.Exec("insert into sample(id, name) values (?, ?)", "4", "canonflow").Error
+
+    assert.Nil(t, err)
+}
+```
+
+### Kode: Query SQL
+
+```go
+
+type Sample struct {
+    ID string
+    Name string
+}
+
+func TestRawSQL(t *testing.T) {
+    var sample Sampel
+
+    err := db.Raw("select id, name from sample where id = ?", "1").Scan(&sample).Error
+
+    assert.Nil(t, err)
+    assert.Equal(t, "1", sample.ID)
+
+    var samples []Sample
+    err = db.Raw("select id, name from sample").Scan(&samples).Error
+
+    assert.Nil(t, err)
+    assert.Equal(t, 4, len(samples))
+}
+```
+
+### `sql.Row` & `sql.Rows`
+
+- GORM sendiri sebenarnya didalamnya tetap menggunakan package `sql` bawaan dari Golang.
+- Jika kita ingin mendapatkan hasil query dalam bentuk `sql.Rows`, kita bisa menggunakan method `Rows()` setelah melakukan query.
+
+### Kode: `sql.Row`
+
+```go
+func TestSQLRow(t *testing.T) {
+    var samples []Sample
+
+    rows, err := db.Raw("select id, name from sample").Rows()
+    assert.Nil(t, err)
+    defer rows.Close()
+
+    for rows.Next() {
+        var id string
+        var name string
+
+        err := rows.Scan(&id, &name)
+        assert.Nil(t, err)
+
+        samples = append(samples, Sample{
+            ID: id,
+            Name: name
+        })
+    }
+
+    assert.Equal(t, 4, len(samples))
+}
+```
+
+### Kode: `gorm.DB.ScanRows()`
+
+```go
+func TestScanRows(t *testing.T) {
+    var samples []Sample
+
+    rows, err := db.Raw("select id, name from sample").Rows()
+    assert.Nil(t, err)
+    defer rows.Close()
+
+    for rows.Next() {
+        err := db.ScanRows(rows, &samples)
+        assert.Nil(t, err)
+    }
+
+    assert.Equal(t, 4, len(sample))
+}
+```
