@@ -970,3 +970,84 @@ func TestAutoIncrement(t *testing.T) {
     }
 }
 ```
+
+---
+
+## Upsert
+
+### Save
+
+- Sebelumnya, kita telah menggunakan method `Save()` untuk melakukan **UPDATE**.
+- Method `Save()` sebenarnya memiliki kemampuan **untuk mendeteksi apakah harus melakukan UPDATE atau CREATE**.
+- Jika data yang kita kirim **tidak memiliki value ID**, maka secara default akan melakukan `CREATE`.
+- Jika data yang kita kirim **memiliki value ID**, maka akan melakukan `UPDATE`.
+- Hal ini mungkin cocok untuk jenis data yang ID nya adalah **Auto Increment**, karena kita **tidak butuh ID** ketika melakukan `CREATE`.
+
+### Kode: Save
+
+```go
+func TestSaveOrUpdate(t *testing.T) {
+    userLog := UserLog{
+        UserID: "1",
+        Action: "Test Action",
+    }
+
+    result := db.Save(&userLog)  // create
+    assert.Nil(t, result.Error)
+
+    userLog.UserId = "2"
+    result = db.Save(&userLog)  // update
+    assert.Nil(result.Error)
+}
+```
+
+### Data Non Auto Increment
+
+- Bagaimana dengan jenis data yang memiliki **ID tidak auto increment**, misalnya data user sebelumnya.
+- Untungnya, `Save()` juga bisa digunakna untuk proses otomatis `CREATE`.
+- Jadi `Save()` akan mencoba melakukan **UPDATE terlebih dahulu**, ketika mendeteksi jumlah `EffectedRow`-nya adalah 0, secara otomatis `Save()` akan melakukan proses `CREATE`.
+
+### Kode: Save Non Auto Increment Data
+
+```go
+func TestSaveOrUpdateNonAutoIncrement(t *testing.T) {
+    user := User{
+        ID: "99",
+        Name: Name{
+            FirstName: "User 99",
+        },
+    }
+
+    result := db.Save(&user) // create
+    assert.Nil(t, result.Error)
+
+    user.Name.FirstName = "User 99 Updated"
+    result = db.Save(&user) // create
+    assert.Nil(t, result.Error)
+}
+```
+
+### On Conflict
+
+- GORM juga menawarkan **pengaturan Conflict** di Method `Create()`.
+- Dengan pengaturan ini, kita bisa menentukan ketika kita coba `Create()` data, lalu **terjadi conflict** (`data sudah ada`), apa yang mau kita lakukan?
+- Kita bisa **mengubah pengaturan conflict** ini menggunakan method `Clauses()`.
+
+### Kode: On Conflict
+
+```go
+func TestConflict(t *testing.T) {
+    user := User{
+        ID: "88",
+        Name: Name{
+            FirstName: "User 88",
+        },
+    }
+
+    result := db.Clauses(clause.OnConflict{
+        UpdateAll: true,
+    }).Save(&user) // create
+
+    assert.Nil(t, result.Error)
+}
+```
