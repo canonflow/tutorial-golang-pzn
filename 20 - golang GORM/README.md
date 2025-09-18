@@ -910,3 +910,63 @@ func TestAutoIncrement(t *testing.T) {
     }
 }
 ```
+
+---
+
+## Timestamp Tracking
+
+- Seperti yang sudah dibahaw di materi [Convention](README.md#convention), bahwa GORM menggunakan field `CreatedAt` dan `UpdatedAt` sebagai **Timestamp Tracking**.
+- Atau jika **ingin menggunakan field yang berbeda**, kita bisa tambahkan tag `gorm:"autoCreateTime"` atau `gorm:"autoUpdateTime"`.
+
+### Tipe Data Timestamp Tracking
+
+- Sebenarnya, kita juga bisa ubah tipe datanya jika kita mau.
+- GORM mendukung tipe data dalam bentuk `number`, dimana **satuannya bisa kita ganti** menjadi `milli` untuk **millisecond**, atau `nano` untuk **nanosecond**, semuanya disimpan dalam **waktu epoch unix time**.
+- Misal `gorm:"autoCreateTime:milli"` atau `gorm:"autoUpdateTime:milli"`.
+- [https://currentmillis.com](https://currentmillis.com)
+
+### Kode: Alter Table User Log
+
+```sql
+DELETE FROM user_logs;
+
+ALTER TABLE user_logs
+    modify created_at bigint not null;
+
+ALTER TABLE user_logs
+    modify updated_at bigint not null;
+```
+
+### Kode: UserLog Model
+
+```go
+type UserLog struct {
+    ID int `gorm:"primaryKey;column:id;autoIncrement"`
+    UserID string `gorm:"column:user_id"`
+    Action string `gorm:"column:action"`
+    CreatedAt int64 `gorm:"column:created_at;autoCreateTime:milli"`
+    UpdatedAt int64 `gorm:"column:updated_at;autoCreateTime:milli;autoUpdateTime:milli"`
+}
+
+func (u *UserLog) TableName() string {
+    return "user_logs"
+}
+```
+
+### Kode: Insert User Log
+
+```go
+func TestAutoIncrement(t *testing.T) {
+    for i := 0; i < 10; i++ {
+        userLog := UserLog{
+            UserID: "1",
+            Action: "Test Action",
+        }
+
+        result := db.Create(&userLog)
+        assert.Nil(t, result.Error)
+        assert.NotEqual(t, 0, userLog.ID)
+        fmt.Println(userLog.ID)
+    }
+}
+```

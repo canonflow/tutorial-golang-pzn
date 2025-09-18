@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -12,8 +11,8 @@ type UserLog struct {
 	ID        int       `gorm:"primaryKey;column:id;autoIncrement"`
 	UserID    string    `gorm:"column:user_id"`
 	Action    string    `gorm:"column:action"`
-	CreatedAt time.Time `gorm:"column:created_at;autoCreateTime"`
-	UpdatedAt time.Time `gorm:"column:updated_at;autoCreateTime;autoUpdateTime"`
+	CreatedAt int64 `gorm:"column:created_at;autoCreateTime:milli"`
+	UpdatedAt int64 `gorm:"column:updated_at;autoCreateTime:milli;autoUpdateTime:milli"`
 }
 
 func (u *UserLog) TableName() string {
