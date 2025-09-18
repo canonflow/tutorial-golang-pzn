@@ -545,3 +545,74 @@ func TestManualTransactionError(t *testing.T) {
     }
 }
 ```
+
+---
+
+## Query
+
+- Sama dengan `Create()`, GORM juga bisa secara otomatis membuat SQL Select dari Model yang kita buat.
+- Sehingga kita tidak perlu lagi membuat SQL Select secara manual.
+
+### Single Object
+
+- GORM menyediakan **beberapa method** untuk mengambil **single object** dari database.
+- `First()`: untuk mengambil **data pertama** yang **diurutkan** berdasarkan `id`.
+- `Take()`: untuk mengambil **satu data**, **tanpa diurutkan**.
+- `Last()`: untuk mengambil **data terakhir** yang **diurutkan** berdasarkan `id`.
+- Jika **data tidak ditemukan**, maka akan `error: gorm.ErrRecordNotFound`.
+
+### Kode: Single Object
+
+```go
+func TestQuerySingleObject(t *testing.T) {
+    user := User{}
+    result := db.First(&user)
+
+    assert.Nil(t, result.Error)
+    assert.Equal(t, "1", user.ID)
+
+    user = User{}
+    result = db.Last(&user)
+    assert.Nil(t, result.Error)
+    assert.Equal(t, "9", user.ID)
+}
+```
+
+### Inline Condition
+
+- Saat kita menggunakan method `First()`, `Take()`, atau `Last()`, terdapat **parameter selanjutnya** bernama `Inline Condition`.
+- **Inline Condition** tersebut secara otomatis akan menjadi kondisi **WHERE** di SQL SELECT-nya.
+
+### Kode: Inline Condition
+
+```go
+func TestQueryInlineCondition(t *testing.T) {
+    user := User{}
+
+    result := db.First(&user, "id = ?", "5")
+    assert.Nil(t, result.Error)
+    assert.Equal(t, "5", user.ID)
+}
+```
+
+### Query All Objects
+
+- GORM juga bisa digunakan untuk melakukan Query untuk semua data di tabel menggunakan method `Find()`.
+- Sama seperti method sebelumnya, method `Find()` juga mendukung **Inline Condition** jika kita mau tambahkan kondisi `Where`-nya.
+- Untuk detail query `Where` akan dibahas di materi [Query Condition](README.md#query-condition).
+
+### Kode: Query All Objects
+
+```go
+func TestQueryAllObjects(t *testing.T) {
+    var users []User
+    result := db.Find(&users, "id in ?", []string{"1", "2", "3", "4"})
+
+    assert.Nil(t, result.Error)
+    assert.Equal(t, 4, len(users))
+}
+```
+
+## Query Condition
+
+- test

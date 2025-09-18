@@ -158,3 +158,50 @@ func TestManualTransactionError(t *testing.T) {
 		PASS
 	*/
 }
+
+func TestQuerySingleObject(t *testing.T) {
+	user := User{}
+	result := db.First(&user)
+
+	assert.Nil(t, result.Error)
+	assert.Equal(t, "1", user.ID)
+
+	user = User{}
+	result = db.Last(&user)
+	assert.Nil(t, result.Error)
+	assert.Equal(t, "9", user.ID)
+
+	/*
+		=== RUN   TestQuerySingleObject
+		--- PASS: TestQuerySingleObject (0.00s)
+		PASS
+	*/
+}
+
+func TestQueryInlineCondition(t *testing.T) {
+	user := User{}
+
+	result := db.First(&user, "id = ?", "5")
+	assert.Nil(t, result.Error)
+	assert.Equal(t, "5", user.ID)
+
+	/*
+		=== RUN   TestQueryInlineCondition
+		--- PASS: TestQueryInlineCondition (0.00s)
+		PASS
+	*/
+}
+
+func TestQueryAllObjects(t *testing.T) {
+	var users []User
+	result := db.Find(&users, "id in ?", []string{"1", "2", "3", "4"})
+
+	assert.Nil(t, result.Error)
+	assert.Equal(t, 4, len(users))
+
+	/*
+		=== RUN   TestQueryAllObjects
+		--- PASS: TestQueryAllObjects (0.00s)
+		PASS
+	*/
+}
