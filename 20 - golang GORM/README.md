@@ -17,3 +17,41 @@
 - Dengan menggunakan GORM, kita bisa fokus membuat pemetaan struct `Entity`, **tanpa harus memikirkan** detail dari implementasi `SQL` yang harus kita buat **untuk memanipulasi datanya**.
 - GORM juga **mendukung relasi** antar `Entity` atau `Table`, baik **One to One**, **One to Many**, sampai **Many to Many**
 - [https://gorm.io](https://gorm.io)
+
+---
+
+## Database Connection
+
+- Untuk membuat koneksi ke database, kita bisa menggunakan `gorm.Open()`.
+- **Tiap database** memiliki `config` masing-masing, kita bisa lihat semua config di database pada halaman: [https://gorm.io/docs/connecting_to_the_database.html](https://gorm.io/docs/connecting_to_the_database.html)
+
+### Kode: Database Connection
+
+```go
+
+import (
+    "gorm.io/driver/mysql"
+    "gorm.io/gorm"
+)
+
+func OpenConnection() *gorm.DB {
+    dialect := mysql.Open("root:@tcp(127.0.0.1:3306)/belajar_golang_gorm?charset=utfmb4&parseTime=True&loc=Local")
+
+    db, err := gorm.Open(dialect, &gorm.Config{})
+    if err != nil {
+        panic(err)
+    }
+
+    return db
+}
+```
+
+### Kode: Test Database Connection
+
+```go
+var db = OpenConnection()
+
+func TestConnection(t *testing.T) {
+    assert.NotNil(t, db)
+}
+```
