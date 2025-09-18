@@ -321,3 +321,50 @@ func (u *User) TableName() string {
     return "users"
 }
 ```
+
+---
+
+## Embedded Struct
+
+- **Secara default**, field di Model akan **menjadi kolom di tabel**, kecuali yang menggunakan field `-` permission.
+- Namun bagaimana jika ternyata field yang kita buat sangat banyak?
+- Kadang-kadang, ada baiknya kita **simpan field yang sejenis** dalam `struct` **yang berbeda**
+- Untungnya, GORM memiliki fitur bernama **embedded struct**, dimana kita bisa melakukan **embed struct** dalam field di Model, sehingga **seluruh isi field** di embedded struct akan **dianggap field di Model utamanya**.
+
+### Kode: Alter Table `users`
+
+```sql
+alter table users
+    rename column name to first_name;
+alter table users
+    add column middle_name varchar(100) null after first_name;
+alter table users
+    add column last_name varchar(100) null after middle_name;
+```
+
+### Kode: Struct Name
+
+```go
+type Name struct {
+    FirstName string `gorm:"column:first_name"`
+    MiddleName string `gorm:"column:middle_name"`
+    LastName string `gorm:"column:last_name"`
+}
+```
+
+### Kode: User Model
+
+```go
+type User struct {
+    ID string `gorm:"primaryKey;column:id;<-:create"`
+    Password string `gorm:"column:password"`
+    Name Name `gorm:"embedded"`
+    CreatedAt time.Time `gorm:"created_at;autoCreateTime;<-:create"`
+    UpdatedAt time.Time `gorm:"updated_at;autoCreateTime;autoUpdateTime"`
+    Information string `gorm:"-"`
+}
+
+func (u *User) TableName() string {
+    return "users"
+}
+```
