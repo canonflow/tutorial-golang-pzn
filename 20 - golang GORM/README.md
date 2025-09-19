@@ -1234,3 +1234,114 @@ func TestLock(t *testing.T) {
     assert.Nil(t, err)
 }
 ```
+
+---
+
+## One to One
+
+- Relationship dalam database yang paling sederhana adalan **One to One**, dimana data di tabel berelasi dengan satu data di tabel lain.
+- Di GORM, One to One disebut juga dengan **Has One**.
+- Untuk membuat relasi One to One, kita **cukup buat field** dengan **tipe Model yang berelasi**.
+- Lalu kita bisa tambahkan informasi di `tag`.
+  - `gorm:"foreignKey:nama_kolom"` untuk kolom yang dijadikan **foreign key**.
+  - `gorm:"references:nama_kolom"` untuk kolom yang dijadikan **reference**.
+
+### kode: Tabel Wallets
+
+```sql
+create table wallets
+(
+    id varchar(100) not null,
+    user_id varchar(100) not null,
+    balance bigint not null,
+    created_at timestamp not null default current_timestamp,
+    updated_at timestamp not null default current_timestamp on update current_timestamp,
+    primary key (id),
+    foreign key (user_id) references users (id)
+) engine = InnoDB;
+```
+
+### Wallet Model
+
+```go
+type Wallet struct {
+    ID string `gorm:"primaryKey;column:id"`
+    UserId string `gorm:"column:user_id"`
+    Balance int64 `gorm:"column:balance"`
+    CreatedAt time.Time `gorm:"column:created_at;autoCreateTime"`
+    UpdatedAt time.Time `gorm:"column:created_at;autoCreateTime;autoUpdateTime"`
+}
+
+func (w *Wallet) TableName() string {
+    return "wallets"
+}
+```
+
+### Kode: User Model
+
+```go
+type User struct {
+	ID          string    `gorm:"primaryKey;column:id;<-:create"`
+	Password    string    `gorm:"column:password"`
+	Name        Name      `gorm:"embedded"`
+	CreatedAt   time.Time `gorm:"column:created_at;autoCreateTime;<-:create"`
+	UpdatedAt   time.Time `gorm:"column:updated_at;autoCreateTime;autoUpdateTime"`
+	Information string    `gorm:"-"`
+    Wallet Wallet `gorm:"foreignKey:user_id;references:id"`
+}
+```
+
+### Kode: Create Wallet
+
+```go
+func TestCreateWallet(t *testing.T) {
+    wallet := Wallet{
+        ID: "1",
+        UserId: "1",
+        Balance: 1000000,
+    }
+
+    err := db.Create(&wallet).Error
+    assert.Nil(t, err)
+}
+```
+
+### Preload
+
+- Secara **default**, **relasi tidak akan di-query oleh GORM**, artinya sifatnya adalah `LAZY`.
+- Jika kita ingin melakukan query relation (`EAGER`) **secara langsung ketika melakukan query Model**, kita **bisa sebutkan relasi** yang ingin kita load menggunakan method `Preload()`.
+
+### Kode: Retrieve Relation (1)
+
+```go
+func TestRetrieveRelation(t *testing.T) {
+    var user User
+    err := db.Model(&User{}).Preload("Wallet").First(&user).Error
+
+    assert.Nil(t, err)
+
+    assert.Equal(t, "1", user.ID)
+    assert.Equal(t, "1", user.Wallet.ID)
+}
+```
+
+### Join
+
+- Menggunakan `Preload()`, GORM akan melakukan pengambilan data relasi **menggunakan query yang terpisah**.
+- Hal ini **cocok ketika** menggunakan relasi **One to Many** atau **Many to Many**.
+- Namun, pada kasus **One to One**, kadang ada baiknya kita **lakukan sekali query** saja menggunakan `JOIN`, karena hasilnya hanya satu data, **jadi lebih cepat**.
+- Jika kita ingin menggunakan `JOIN`, kita bisa menggunakan method `Joins()`, lalu **menyebutkan field mana** yang akan kita lakukan `JOIN`.
+- Method `Joins()` akan menggunakan `LEFT JOIN` untuk defaultnya
+
+### Kode: Join
+
+```go
+func TestRetrieveRelationJoin(t *testing.T) {
+    var users []User
+    err := db.Model(&User{}).Joins("Wallet").Find(&users).Error
+
+    assert.Nil(t, err)
+
+    assert.Equal(t, 14, len(users))
+}
+```
