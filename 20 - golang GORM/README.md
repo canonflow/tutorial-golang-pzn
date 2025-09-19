@@ -1269,7 +1269,7 @@ type Wallet struct {
     UserId string `gorm:"column:user_id"`
     Balance int64 `gorm:"column:balance"`
     CreatedAt time.Time `gorm:"column:created_at;autoCreateTime"`
-    UpdatedAt time.Time `gorm:"column:created_at;autoCreateTime;autoUpdateTime"`
+    UpdatedAt time.Time `gorm:"column:updated_at;autoCreateTime;autoUpdateTime"`
 }
 
 func (w *Wallet) TableName() string {
@@ -1398,6 +1398,104 @@ func TestSkipAutoCreateUpdate(t *testing.T) {
     }
 
     err := db.Omit(clause.Associations).Create(&user).Error
+    assert.Nil(t, err)
+}
+```
+
+---
+
+## One to Many
+
+- Relasi One to Many adalah relasi dimana data di tabel bisa memiliki relasi **ke banyak data** di tabel lain.
+- Di GORM, One to Many juga disebut relasi **Has Many**.
+- Untuk **membuat relasi One to Many**, kita bisa gunakan **field** dengan tipe **Slice Model** yang berelasi.
+- Kita juga bisa menentukan informasi seperti `foreignKey` dan `references`-nya, sama seperti ketika menggunakan relasi One to One.
+
+### Kode: Table Addresses
+
+```sql
+create table addresses
+(
+    id bigint not null auto_increment,
+    user_id varchar(100) not null,
+    address varchar(100) not null,
+    created_at timestamp not null default current_timestamp,
+    updated_at timestamp not null default current_timestamp on update current_timestamp,
+    primary key (id),
+    foreign key (user_id) references users (id)
+) engine = InnoDB;
+```
+
+### Kode: Address Model
+
+```go
+type Address struct {
+    ID int64 `gorm:"primaryKey;column:id;autoIncrement"`
+    UserId string `gorm:"column:user_id"`
+    Address string `gorm:"column:address"`
+    CreatedAt time.Time `gorm:"column:created_at;autoCreateTime"`
+    UpdatedAt time.Time `gorm:"column:updated_at;autoCreateTime;autoUpdateTime"`
+}
+```
+
+### Kode: User Model
+
+```go
+type User struct {
+	ID          string    `gorm:"primaryKey;column:id;<-:create"`
+	Password    string    `gorm:"column:password"`
+	Name        Name      `gorm:"embedded"`
+	CreatedAt   time.Time `gorm:"column:created_at;autoCreateTime;<-:create"`
+	UpdatedAt   time.Time `gorm:"column:updated_at;autoCreateTime;autoUpdateTime"`
+	Information string    `gorm:"-"`
+    Wallet Wallet `gorm:"foreignKey:user_id;references:id"`
+    Addresses []Address `gorm:"foreignKey:user_id;references:id"`
+}
+```
+
+### Kode: Auto Create / Update
+
+```go
+func TestUserAndAddresses(t *testing.T) {
+    user := User{
+        ID: "50",
+        Password: "rahasia",
+        Name: Name{
+            FirstName: "User 50",
+        },
+        Wallet: Wallet{
+            ID: "50",
+            UserId: "50",
+            Balance: 1000000,
+        },
+        Addresses: []Address{
+            {
+                UserId: "50",
+                Address: "jalan A",
+            },
+            {
+                UserId: "50",
+                Address: "Jalan B",
+            },
+        },
+    }
+
+    err := db.Create(&user).Error
+    assert.Nil(t, err)
+}
+```
+
+### Kode: Preload & Join
+
+```go
+func TestPreloadJoinOneToMany(t *testing.T) {
+    var userPreload []User
+
+    err := db.Model(&User{}).
+        Preload("Addresses").
+        Joins("Wallet").
+        Find(&userPreload).Error
+
     assert.Nil(t, err)
 }
 ```
