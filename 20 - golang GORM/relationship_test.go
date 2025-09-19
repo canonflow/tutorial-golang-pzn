@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"gorm.io/gorm/clause"
 )
 
 type Wallet struct {
@@ -65,6 +66,56 @@ func TestRetrieveRelationJoin(t *testing.T) {
 	/*
 		=== RUN   TestRetrieveRelationJoin
 		--- PASS: TestRetrieveRelationJoin (0.00s)
+		PASS
+	*/
+}
+
+func TestAutoCreateUpdate(t *testing.T) {
+	user := User{
+		ID:       "20",
+		Password: "rahasia",
+		Name: Name{
+			FirstName: "User 20",
+		},
+		Wallet: Wallet{
+			ID:      "20",
+			UserId:  "20",
+			Balance: 1000000,
+		},
+	}
+
+	// Akan otomatis membuat data untuk tabel wallets juga
+	err := db.Create(&user).Error
+	assert.Nil(t, err)
+
+	/*
+		=== RUN   TestAutoCreateUpdate
+		--- PASS: TestAutoCreateUpdate (0.00s)
+		PASS
+	*/
+}
+
+func TestSkipAutoCreateUpdate(t *testing.T) {
+	user := User{
+		ID:       "21",
+		Password: "rahasia",
+		Name: Name{
+			FirstName: "User 21",
+		},
+		Wallet: Wallet{
+			ID:      "21",
+			UserId:  "21",
+			Balance: 1000000,
+		},
+	}
+
+	// Wallet tidak akan dibuat
+	err := db.Omit(clause.Associations).Create(&user).Error
+	assert.Nil(t, err)
+
+	/*
+		=== RUN   TestSkipAutoCreateUpdate
+		--- PASS: TestSkipAutoCreateUpdate (0.00s)
 		PASS
 	*/
 }

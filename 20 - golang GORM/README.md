@@ -1345,3 +1345,59 @@ func TestRetrieveRelationJoin(t *testing.T) {
     assert.Equal(t, 14, len(users))
 }
 ```
+
+---
+
+## Auto Upsert Relation
+
+- Saat kita menggunakan relasi, lalu kita ingin melakukan **create/update** data Model, secara **default** GORM akan **mengecek relasi** yang terdapat **di data tersebut**.
+- **Jika terdapat data relasi**, GORM akan melaukan proses `Upsert` **terhadap data relasinya**, sehingga kita **tidak perlu melakukan** create/update data relasi **secara manual**.
+
+### Kode: Auto Create / Update
+
+```go
+func TestAutoCreateUpdate(t *testing.T) {
+    user := User{
+        ID: "20",
+        Password: "rahasia",
+        Name: Name{
+            FirstName: "User 20",
+        },
+        Wallet: Wallet{
+            ID: "20",
+            UserId: "20",
+            Balance: 1000000,
+        },
+    }
+
+    err := db.Create(&user).Error
+    assert.Nil(t, err)
+}
+```
+
+### Skip Auto Create / Update
+
+- Jika kita **tidak mau** melakuakn **auto create/update** `data relasi`, kita bisa gunakan method `Omit()` yang berisi `clause.Associations`.
+- Ini **memberitahu** GORM **bahwa kita tidak mau** melakukan **auto create/update** untuk data relasinya.
+
+### Kode: Skip Auto Create / Update
+
+```go
+func TestSkipAutoCreateUpdate(t *testing.T) {
+    user := User{
+        ID: "21",
+        Password: "rahasia",
+        Name: Name{
+            FirstName: "User 21",
+        },
+        Wallet: Wallet{
+            ID: "21",
+            UserId: "21",
+            Balance: 1000000,
+        },
+    }
+
+    err := db.Omit(clause.Associations).Create(&user).Error
+    assert.Nil(t, err)
+}
+```
