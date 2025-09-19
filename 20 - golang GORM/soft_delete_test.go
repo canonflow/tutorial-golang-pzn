@@ -2,20 +2,27 @@ package main
 
 import (
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
+// type Todo struct {
+// 	ID          int64          `gorm:"primaryKey;column:id;autoIncrement"`
+// 	UserID      string         `gorm:"column:user_id"`
+// 	Title       string         `gorm:"column:title"`
+// 	Description string         `gorm:"column:description"`
+// 	CreatedAt   time.Time      `gorm:"column:created_at;autoCreateTime"`
+// 	UpdatedAt   time.Time      `gorm:"column:updated_at;autoCreateTime;autoUpdateTime"`
+// 	DeletedAt   gorm.DeletedAt `gorm:"column:deleted_at"`
+// }
+
 type Todo struct {
-	ID          int64          `gorm:"primaryKey;column:id;autoIncrement"`
-	UserID      string         `gorm:"column:user_id"`
-	Title       string         `gorm:"column:title"`
-	Description string         `gorm:"column:description"`
-	CreatedAt   time.Time      `gorm:"column:created_at;autoCreateTime"`
-	UpdatedAt   time.Time      `gorm:"column:updated_at;autoCreateTime;autoUpdateTime"`
-	DeletedAt   gorm.DeletedAt `gorm:"column:deleted_at"`
+	gorm.Model
+	UserID      string `gorm:"column:user_id"`
+	Title       string `gorm:"column:title"`
+	Description string `gorm:"column:description"`
 }
 
 func (t *Todo) TableName() string {
@@ -67,6 +74,29 @@ func TestUnscoped(t *testing.T) {
 	/*
 		=== RUN TestUnscoped
 		--- PASS: TestUnscoped (0.00s)
+		PASS
+	*/
+}
+
+func TestLock(t *testing.T) {
+	err := db.Transaction(func(tx *gorm.DB) error {
+		var user User
+		err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).
+			First(&user, "id = ?", "1").Error
+		if err != nil {
+			return err
+		}
+
+		user.Name.FirstName = "Joko"
+		user.Name.LastName = "Morro"
+		return tx.Save(&user).Error
+	})
+
+	assert.Nil(t, err)
+
+	/*
+		=== RUN   TestLock
+		--- PASS: TestLock (0.02s)
 		PASS
 	*/
 }

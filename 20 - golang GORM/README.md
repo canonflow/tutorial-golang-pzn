@@ -1184,3 +1184,53 @@ func TestUnscoped(t *testing.T) {
 
 - Saat menggunakan **Soft Delete**, perhatikan penggunaan **Primary Key** atay **Unique Index**.
 - ketika **data sudah dihapus secara** **Soft Delete**, sebenarnya **data masih ada di table**. Oleh karena itu, pastikan data primary key atau unique index **tidak duplicate** dengan **data yang sudah dihapus** secara `soft delete`.
+
+---
+
+## Model Struct
+
+- GORM menyediakan sebuah struct bernama `Model` yang berisi field `ID`, `CreatedAt`, `UpadtedAt`, dan `DeletedAt`.
+- Ini cocok digunakan ketika kita menggunakan field yang sesuai dengan **convention-nya GORM**
+- Contoh misal kita bisa gunakan struct Model ini ketika membuat model `Todo`.
+
+### Kode: Todo Model
+
+```go
+type Todo struct {
+    gorm.Model
+    UserID      string         `gorm:"column:user_id"`
+	Title       string         `gorm:"column:title"`
+	Description string         `gorm:"column:description"`
+}
+```
+
+---
+
+## Lock
+
+- Hal yang biasa kita lakukan saat menggunakan database adalah melakukan **Lock data**.
+- Biasanya, ini dilakukan **agar tidak terjadi RACE CONDITION** ketika memanipulasi **data yang sama** oleh **beberapa request**.
+- Untuk melakukan `Lock` menggunakan GORM, kita bisa tambahkan `Clauses()` Locking.
+- Kita **bisa menentukan jenis Lock-nya**, apakah itu **UPDATE**, **SHARE**, atau yang lainnya. **Sesuai dengan dukungan database** yang kita gunakan.
+
+### Kode: Lock
+
+```go
+func TestLock(t *testing.T) {
+    err := db.Transaction(func(tx *gorm.DB) error {
+        var user User
+        err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).
+            First(&user, "id = ?", "1").Error
+
+        if err != nil {
+            return err
+        }
+
+        user.Name.FirstName = "Joko"
+        user.Name.LastName = "Morro"
+        return tx.Save(&user).Error
+    })
+
+    assert.Nil(t, err)
+}
+```
