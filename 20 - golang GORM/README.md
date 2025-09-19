@@ -1499,3 +1499,83 @@ func TestPreloadJoinOneToMany(t *testing.T) {
     assert.Nil(t, err)
 }
 ```
+
+---
+
+## Belongs To
+
+### Belongs To di One to Many
+
+- Saat kita membuat relasi One to Many, **ada sudut pandang lain** dari Model sebelahnya, yaitu relasi **Many to One**.
+- Pada Kasus ini, kita bisa menggunakan relasi **Belongs To (milik)** di GORM.
+- Contoh sebelumnya kita tahu bahwa User punya banyak Address, artinya `Address` milik (belongs to) `User`.
+- Kita bisa **tambahkan relasi ini** di model `Address`, agar ketika kita melakukan **Query ke Model** `Address`, kita **juga bisa mendapatkan informasi** relasi `User`-nya
+- Cara membuatnya mirip seperti ketika membuat relasi One to One.
+
+### Kode: Address Model
+
+```go
+type Address struct {
+	ID        int64     `gorm:"primaryKey;column:id;autoIncrement"`
+	UserId    string    `gorm:"column:user_id"`
+	Address   string    `gorm:"column:address"`
+	CreatedAt time.Time `gorm:"column:created_at;autoCreateTime"`
+	UpdatedAt time.Time `gorm:"column:updated_at;autoCreateTime;autoUpdateTime"`
+    User User           `gorm:"foreignKey:user_id;references:id"`
+}
+```
+
+### Kode: Preload atau Join
+
+```go
+func TestBelongsTo(t *testing.T) {
+    fmt.Println("Preload")
+    var addresses []Address
+    err := db.Preload("User").Find(&addresses).Error
+    assert.Nil(t, err)
+
+
+    fmt.Println("Joins")
+    addresses = []Address{}
+    err = db.Joins("User").Find(&addresses).Error
+    assert.Nil(t, err)
+}
+```
+
+### Belongs To di One to One
+
+- Selain di One to Many, Belongs To bisa diimplementasikan di relasi One to One.
+- Sebelumnya kita tahu bahwa `User` punya satu (Has One) `Wallet`, artinya `Wallet` itu milik (Belongs To) `User`
+- Kita bisa tambahkan field `User` di `Wallet` sebagai relasi **Belongs To**.
+- Namun, karena di Golang, **cyclic itu tidak boleh**, maka untuk menambahkan relasi Belongs To di One to One, kita perlu menggunakan `pointer`.
+
+### Kode: Wallet Model
+
+```go
+type Wallet struct {
+	ID        string    `gorm:"primaryKey;column:id"`
+	UserId    string    `gorm:"column:user_id"`
+	Balance   int64     `gorm:"column:balance"`
+	CreatedAt time.Time `gorm:"column:created_at;autoCreateTime"`
+	UpdatedAt time.Time `gorm:"column:updated_at;autoCreateTime;autoUpdateTime"`
+    User      *User     `gorm:"foreignKey:user_id;references:id"`
+    // Gunakan pointer untuk menghindari cyclic dependency
+}
+```
+
+### Kode: Belongs To di One to One
+
+```go
+func TestBelongsToOneToOne(t *testing.T) {
+    fmt.Println("Preload")
+    var wallets []Wallet
+
+    err := db.Preload("User").Find(&wallets).Error
+    assert.Nil(t, err)
+
+    fmt.Println("Joins")
+    wallets = []Wallet{}
+    err = db.Joins("User").Find(&wallets).Error
+    assert.Nil(t, err)
+}
+```

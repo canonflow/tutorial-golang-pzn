@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -14,6 +15,9 @@ type Wallet struct {
 	Balance   int64     `gorm:"column:balance"`
 	CreatedAt time.Time `gorm:"column:created_at;autoCreateTime"`
 	UpdatedAt time.Time `gorm:"column:updated_at;autoCreateTime;autoUpdateTime"`
+	User      *User     `gorm:"foreignKey:user_id;references:id"`
+
+	// Gunakan pointer untuk menghindari cyclic dependency
 }
 
 func (w *Wallet) TableName() string {
@@ -26,6 +30,7 @@ type Address struct {
 	Address   string    `gorm:"column:address"`
 	CreatedAt time.Time `gorm:"column:created_at;autoCreateTime"`
 	UpdatedAt time.Time `gorm:"column:updated_at;autoCreateTime;autoUpdateTime"`
+	User      User      `gorm:"foreignKey:user_id;references:id"`
 }
 
 func TestCreateWallet(t *testing.T) {
@@ -175,6 +180,43 @@ func TestPreloadJoinOneToMany(t *testing.T) {
 	/*
 		=== RUN   TestPreloadJoinOneToMany
 		--- PASS: TestPreloadJoinOneToMany (0.00s)
+		PASS
+	*/
+}
+
+func TestBelongsTo(t *testing.T) {
+	fmt.Println("Preload")
+	var addresses []Address
+	err := db.Preload("User").Find(&addresses).Error
+	assert.Nil(t, err)
+
+	fmt.Println("Joins")
+	addresses = []Address{}
+	err = db.Joins("User").Find(&addresses).Error
+	assert.Nil(t, err)
+
+	/*
+		=== RUN   TestBelongsTo
+		--- PASS: TestBelongsTo (0.00s)
+		PASS
+	*/
+}
+
+func TestBelongsToOneToOne(t *testing.T) {
+	fmt.Println("Preload")
+	var wallets []Wallet
+
+	err := db.Preload("User").Find(&wallets).Error
+	assert.Nil(t, err)
+
+	fmt.Println("Joins")
+	wallets = []Wallet{}
+	err = db.Joins("User").Find(&wallets).Error
+	assert.Nil(t, err)
+
+	/*
+		=== RUN   TestBelongsToOneToOne
+		--- PASS: TestBelongsToOneToOne (0.00s)
 		PASS
 	*/
 }
