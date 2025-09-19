@@ -33,6 +33,15 @@ type Address struct {
 	User      User      `gorm:"foreignKey:user_id;references:id"`
 }
 
+type Product struct {
+	ID           string    `gorm:"primaryKey;column:id"`
+	Name         string    `gorm:"column:name"`
+	Price        int64     `gorm:"column:price"`
+	CreatedAt    time.Time `gorm:"column:created_at;autoCreateTime"`
+	UpdatedAt    time.Time `gorm:"column:updated_at;autoCreateTime;autoUpdateTime"`
+	LikedByUsers []User    `gorm:"many2many:user_like_product;foreignKey:id;joinForeignKey:product_id;references:id;joinReferences:user_id"`
+}
+
 func TestCreateWallet(t *testing.T) {
 	wallet := Wallet{
 		ID:      "1",
@@ -217,6 +226,52 @@ func TestBelongsToOneToOne(t *testing.T) {
 	/*
 		=== RUN   TestBelongsToOneToOne
 		--- PASS: TestBelongsToOneToOne (0.00s)
+		PASS
+	*/
+}
+
+func TestCreateManyToMany(t *testing.T) {
+	product := Product{
+		ID:    "P001",
+		Name:  "Contoh Product",
+		Price: 10000,
+	}
+
+	err := db.Create(&product).Error
+	assert.Nil(t, err)
+
+	// Create data into user_like_product table
+	err = db.Table("user_like_product").
+		Create(map[string]interface{}{
+			"user_id":    "1",
+			"product_id": "P001",
+		}).Error
+	assert.Nil(t, err)
+
+	err = db.Table("user_like_product").
+		Create(map[string]interface{}{
+			"user_id":    "2",
+			"product_id": "P001",
+		}).Error
+	assert.Nil(t, err)
+
+	/*
+		=== RUN   TestCreateManyToMany
+		--- PASS: TestCreateManyToMany (0.01s)
+		PASS
+	*/
+}
+
+func TestPreloadManyToMany(t *testing.T) {
+	var product Product
+	err := db.Preload("LikedByUsers").First(&product, "id = ?", "P001").Error
+
+	assert.Nil(t, err)
+	assert.Equal(t, 2, len(product.LikedByUsers))
+
+	/*
+		=== RUN   TestPreloadManyToMany
+		--- PASS: TestPreloadManyToMany (0.00s)
 		PASS
 	*/
 }

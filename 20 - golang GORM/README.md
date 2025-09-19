@@ -1579,3 +1579,154 @@ func TestBelongsToOneToOne(t *testing.T) {
     assert.Nil(t, err)
 }
 ```
+
+---
+
+## Many to Many
+
+- Relasi yang paling kompleks adalah relasi Many to Many.
+- Seperti yg kita tahu, bahwa relasi Many to Many, kita harus membuat tabel jembatan penghubung antara 2 tabel.
+- GORM juga mendukung relasi Many to Many, caranya mudah kita **hanya perlu membuat field** berupa `Slice` di **kedua Model** yang berelasi.
+- Untuk **memberitahu** **tabel penghubung** dan juga **kolom untuk join**, kita bisa menggunakan tag.
+
+### Many to Many Tag
+
+- Untuk memberitahu **nama tabel penghubung**, kita bisa menggunakan tag `gorm:"many2many:nama_tabel"`.
+- Saat melakukan query Many to Many, terdapat banyak sekali kolom yang perlu diketahui, sepert:
+  - Kolom `ID` di Model **pertama**.
+  - Kolom `Foreign Key` Model **pertama** di **tabel penghubung**.
+  - Kolom `ID` di Model **kedua**.
+  - Kolokm `Foregin Key` Model **kedua** di **tabel penghubung**.
+- Semua bisa kita lakukan dengan menggunakan Tag:
+  - `gorm:"foreignKey:kolom_id"`: untuk `ID` di Model pertama.
+  - `gorm:"joinForeignKey:kolom_id"`: untuk `Foreign Key` Model pertama di tabel penghubung.
+  - `gorm:"references:kolom_id"`: untuk `ID` di Model kedua.
+  - `gorm:"referencesForeignKey:kolom_id"`: untuk `Foreign Key` Model kedua di tabel penghubung.
+
+### Contoh Kasus
+
+- Misal kita akan membuat fitur dimana `User` bisa like banyak `Product`, dan satu `Product` bisa dilike banyak `User`.
+- Artinya kita akan membuat model `Product`, lalu akan membuat Relasi Many to Many antara `User` dan `Product`.
+
+### Kode: Tabel Products
+
+```sql
+create table products
+(
+    id varchar(100) not null,
+    name varchar(100) not null,
+    price bigint not null,
+    created_at timestamp not null default current_timestamp,
+    updated_at timestamp not null default current_timestamp on update current_timestamp,
+    primary key (id)
+) engine = InnoDB;
+```
+
+### Kode: Product Model
+
+```go
+type Product struct {
+    ID string `gorm:"primaryKey;column:id"`
+    Name string `gorm:"column:name"`
+    Price int64 `gorm:"column:price"`
+    CreatedAt time.Time `gorm:"column:created_at;autoCreateTime"`
+    UpdatedAt time.Time `gorm:"column:updated_at;autoCreateTime;autoUpdateTime"`
+}
+```
+
+### Kode: Tabel Penghubung user_like_product
+
+```sql
+create table user_like_product
+(
+    user_id varchar(100) not null,
+    product_id varchar(100) not null,
+    primary key (user_id, product_id),
+    foreign key (user_id) references users (id),
+    foreign key (product_id) references products (id)
+) engine = InnoDB;
+```
+
+### Kode: User Model
+
+```go
+type User struct {
+	ID           string    `gorm:"primaryKey;column:id;<-:create"`
+	Password     string    `gorm:"column:password"`
+	Name         Name      `gorm:"embedded"`
+	CreatedAt    time.Time `gorm:"column:created_at;autoCreateTime;<-:create"`
+	UpdatedAt    time.Time `gorm:"column:updated_at;autoCreateTime;autoUpdateTime"`
+	Information  string    `gorm:"-"`
+	Wallet       Wallet    `gorm:"foreignKey:user_id;references:id"`
+	Addresses    []Address `gorm:"foreignKey:user_id;references:id"`
+	LikeProducts []Product `gorm:"many2many:user_like_product;foreignKey:id;joinForeignKey:user_id;references:id;joinReferences:product_id"`
+}
+```
+
+### Kode: Product Model with Users
+
+```go
+type Product struct {
+	ID           string    `gorm:"primaryKey;column:id"`
+	Name         string    `gorm:"column:name"`
+	Price        int64     `gorm:"column:price"`
+	CreatedAt    time.Time `gorm:"column:created_at;autoCreateTime"`
+	UpdatedAt    time.Time `gorm:"column:updated_at;autoCreateTime;autoUpdateTime"`
+	LikedByUsers []User    `gorm:"many2many:user_like_product;foreignKey:id;joinForeignKey:product_id;references:id;joinReferences:user_id"`
+}
+```
+
+### Create / Update / Delete Relasi Many to Many
+
+- Salah satu tantangan relasi Many to Many adalah: Bagaimana cara melakukan **Create/Update/Delete** relasi Many to Many?
+- Hal ini karena **tabel penghubung** **tidak memiliki representasi** Model di GORM.
+- Untungnya, GORM bisa digunakan untuk memanipulasi data, tanpa harus menggunakan Model
+- Kita bisa gunakan method `Table()` pada `gorm.DB` untuk **menyebutkan tabel** mana yang mau **kita pilih**.
+- Walaupun cara ini bisa dilakukan, tapi sebenarnya cara yang lebih baik itu menggunakan fitur bernama [Association Mode](README.md#association-mode)
+
+### Kode: Create Many to Many
+
+```go
+func TestCreateManyToMany(t *testing.T) {
+    product := Product{
+        ID: "P001",
+        Name: "Contoh Product",
+        Price: 10000,
+    }
+
+    err := db.Create(&product).Error
+    assert.Nil(t, err)
+
+    // Create data into user_like_product table
+    err = db.Table("user_like_product").
+        Create(map[string]interface{}{
+            "user_id": "1",
+            "product_id": "P001",
+        }).Error
+    assert.Nil(t, err)
+
+
+    err = db.Table("user_like_product").
+        Create(map[string]interface{}{
+            "user_id": "2",
+            "product_id": "P001",
+        }).Error
+    assert.Nil(t, err)
+}
+```
+
+### Kode: Preload
+
+```go
+func TestPreloadManyToMany(t *testing.T) {
+    var product Product
+    err := db.Preload("LikedByUsers").First(&product, "id = ?", "P001").Error
+
+    assert.Nil(t, err)
+    assert.Equal(t, 2, len(product.LikedByUsers))
+}
+```
+
+---
+
+## Association Mode
