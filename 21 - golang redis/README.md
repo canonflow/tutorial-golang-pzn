@@ -215,3 +215,21 @@ func TestGeoPoint(t *testing.T) {
     assert.Equal(t, []string{"Toko A", "Toko B"}, sellers)
 }
 ```
+
+---
+
+## Hyper Log Log
+
+- Kita dapat menggunakan struktur data `Hyper Log Log` di Golang Redis.
+
+### Kode: Hype Log Log
+
+```go
+func TestHyperLogLog(t *testing.T) {
+    client.PFAdd(ctx, "visitor", "nathan", "garzya", "santoso")
+    client.PFAdd(ctx, "visitor", "nathan", "canon", "flow")
+    client.PFAdd(ctx, "visitor", "canon", "flow", "joko")
+
+    assert.Equal(t, int64(6), client.PFCount(ctx, "visitors").Val())
+}
+```

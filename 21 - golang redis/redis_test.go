@@ -165,3 +165,17 @@ func TestGeoPoint(t *testing.T) {
 		PASS
 	*/
 }
+
+func TestHyperLogLog(t *testing.T) {
+	client.PFAdd(ctx, "visitors", "nathan", "garzya", "santoso")
+	client.PFAdd(ctx, "visitors", "nathan", "canon", "flow")
+	client.PFAdd(ctx, "visitors", "canon", "flow", "joko")
+
+	assert.Equal(t, int64(6), client.PFCount(ctx, "visitors").Val())
+
+	/*
+		=== RUN   TestHyperLogLog
+		--- PASS: TestHyperLogLog (0.02s)
+		PASS
+	*/
+}
