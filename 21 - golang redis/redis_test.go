@@ -1,0 +1,61 @@
+package main
+
+import (
+	"context"
+	"testing"
+	"time"
+
+	"github.com/redis/go-redis/v9"
+	"github.com/stretchr/testify/assert"
+)
+
+var client = redis.NewClient(&redis.Options{
+	Addr: "localhost:6379",
+	DB:   0,
+})
+
+func TestConnection(t *testing.T) {
+	assert.NotNil(t, client)
+
+	err := client.Close()
+	assert.Nil(t, err)
+
+	/*
+		=== RUN   TestConnection
+		--- PASS: TestConnection (0.00s)
+		PASS
+	*/
+}
+
+var ctx = context.Background()
+
+func TestPing(t *testing.T) {
+	result, err := client.Ping(ctx).Result()
+
+	assert.Nil(t, err)
+	assert.Equal(t, "PONG", result)
+
+	/*
+		=== RUN	  TestPing
+		--- PASS: TestPing (0.01s)
+		PASS
+	*/
+}
+
+func TestString(t *testing.T) {
+	client.SetEx(ctx, "name", "Nathan Garzya", time.Second*5)
+
+	result, err := client.Get(ctx, "name").Result()
+	assert.Nil(t, err)
+	assert.Equal(t, "Nathan Garzya", result)
+
+	time.Sleep(time.Second * 5)
+	result, err = client.Get(ctx, "name").Result()
+	assert.NotNil(t, err)
+
+	/*
+		=== RUN   TestString
+		--- PASS: TestString (5.02s)
+		PASS
+	*/
+}
