@@ -95,3 +95,20 @@ func TestSet(t *testing.T) {
 		PASS
 	*/
 }
+
+func TestSortedSet(t *testing.T) {
+	client.ZAdd(ctx, "scores", redis.Z{Score: 100, Member: "nathan"})
+	client.ZAdd(ctx, "scores", redis.Z{Score: 85, Member: "garzya"})
+	client.ZAdd(ctx, "scores", redis.Z{Score: 95, Member: "santoso"})
+
+	assert.Equal(t, []string{"garzya", "santoso", "nathan"}, client.ZRange(ctx, "scores", 0, 2).Val())
+	assert.Equal(t, "nathan", client.ZPopMax(ctx, "scores").Val()[0].Member)
+	assert.Equal(t, "santoso", client.ZPopMax(ctx, "scores").Val()[0].Member)
+	assert.Equal(t, "garzya", client.ZPopMax(ctx, "scores").Val()[0].Member)
+
+	/*
+		=== RUN   TestSortedSet
+		--- PASS: TestSortedSet (0.02s)
+		PASS
+	*/
+}

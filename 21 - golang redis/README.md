@@ -94,9 +94,9 @@ func TestString(t *testing.T) {
 
 ```go
 func TestList(t *testing.T) {
-    client.RPush(ctx, "names", "nathan")
-    client.RPush(ctx, "names", "garzya")
-    client.RPush(ctx, "names", "santoso")
+    client.RPush(ctx, "names", "nathan") // nathan
+    client.RPush(ctx, "names", "garzya") // nathan, garzya
+    client.RPush(ctx, "names", "santoso") // nathan, garzya, santoso
 
     assert.Equal(t, "nathan", client.LPop(ctx, "names").Val())
     assert.Equal(t, "garzya", client.LPop(ctx, "names").Val())
@@ -125,5 +125,27 @@ func TestSet(t *testing.T) {
 
     assert.Equal(t, int64(3), client.SCard(ctx, "students").Val())
     assert.Equal(t, []string{"nathan", "garzya", "santoso"}, client.SMembers(ctx, "students").Val())
+}
+```
+
+---
+
+## Sorted Set
+
+- Kita juga dapat menggunakan struktur data `Sorted Set` di Golang Redis.
+- **Default**, diurutkan berdasarkan terkecil `min, ..., max`
+
+### Kode: Sorted Set
+
+```go
+func TestSortedSet(t *testing.T) {
+    client.ZAdd(ctx, "scores", redis.Z{Score: 100, Member: "nathan"})
+    client.ZAdd(ctx, "scores", redis.Z{Score: 85, Member: "garzya"})
+    client.ZAdd(ctx, "scores", redis.Z{Score: 95, Member: "santoso"})
+
+    assert.Equal(t, []string{"garzya", "santoso", "nathan"}, client.ZRange(ctx, "scores", 0, 2).Val())
+    assert.Equal(t, "nathan", client.ZPopMax(ctx, "scores").Val()[0].Member)
+    assert.Equal(t, "santoso", client.ZPopMax(ctx, "scores").Val()[0].Member)
+    assert.Equal(t, "garzya", client.ZPopMax(ctx, "scores").Val()[0].Member)
 }
 ```
