@@ -1730,3 +1730,104 @@ func TestPreloadManyToMany(t *testing.T) {
 ---
 
 ## Association Mode
+
+- GORM memiliki fitur bernama **Association Mode**, yang digunakan **untuk memanipulasi data relasi** menggunakan object `gorm.Association`.
+- Fitur ini sangat berguna, misal ketika **kita ingin menambah relasi ke Model**, **terutama** untuk relasi **Many to Many** yang tidak memiliki Model untuk tabel penghubungnya.
+- Untuk membuat object `Association`, kita cukup menggunakan method `Association(relasi)`.
+
+### Kode: Mencari Relasi
+
+```go
+func TestAssociationFind(t *testing.T) {
+    var product Product
+    err := db.First(&product, "id = ?", "P001").Error
+    assert.Nil(t, err)
+
+    var users []User
+    err = db.Model(&product).
+        Where("first_name LIKE ?", "User%").
+        Association("LikedByUsers").
+        Find(&users)
+    assert.Nil(t, err)
+    assert.Equal(t, 1, len(users))
+}
+```
+
+### Kode: Add Relation
+
+```go
+func TestAssociationAdd(t *testing.T) {
+    var user User
+    err := db.First(&user, "id = ?", "3").Error
+    assert.Nil(t, err)
+
+    var product Product
+    err = db.First(&product, "id = ?", "P001").Error
+    assert.Nil(t, err)
+
+    err = db.Model(&product).Association("LikedByUsers").Append(&user)
+    assert.Nil(t, err)
+}
+```
+
+### Kode: Replace Relation
+
+```go
+func TestAssociationReplace(t *testing.T) {
+    err := db.Transaction(func (tx *gorm.DB) error {
+        var user User
+        err := tx.First(&user, "id = ?", "1").Error
+        assert.Nil(t, err)
+
+        wallet := Wallet{
+            ID: "01",
+            UserId: "1",
+            Balance: 2000000,
+        }
+
+        err = tx.Model(&user).Association("Wallet").Replace(&wallet)
+
+        return err
+    })
+
+    assert.Nil(t, err)
+}
+```
+
+### Kenapa Error?
+
+- Hal ini karena di Tabel `wallets`, kita menambahkan aturan **constraint** `NOT NULL`.
+- Jika ketika GORM membuat Wallet dengan `ID` **01**, dan dia coba **menghapus** `user_id` di wallet **sebelumnya** yaitu **wallet 1**, maka terjadi `error`.
+- Namun dari sini kita bisa tahu bahwa, GORM akan **menghapus relasi ke data sebelumnya** ketika kita melakukan `Replace()`.
+- `Replace()` ini **hanya cocok** untuk relasi **One to One** atau **Belongs To**, dan ketika kita coba menggunakan `Append()` di relasi tersebut, secara otomatis GORM akan mengubah menjadi operasi `Replace()`, **bukan** `Append()` lagi.
+
+### Kode: Delete Relation
+
+```go
+func TestAssociationDelete(t *testing.T) {
+    var user User
+    err := db.First(&user, "id = ?", "3").Error
+    assert.Nil(t, err)
+
+    var product Product
+    err = db.First(&product, "id = ?", "P001").Error
+    assert.Nil(t, err)
+
+    err = db.Model(&product).Association("LikedByUsers").Delete(&user)
+    assert.Nil(t, err)
+}
+```
+
+### Clear Relation
+
+```go
+func TestAssocationClear(t *testing.T) {
+    var product Product
+    err := db.First(&product, "id = ?", "P001").Error
+    assert.Nil(t, err)
+
+    err = db.Model(&product).Association("LikedByUsers").Clear()
+    assert.Nil(t, err)
+    fmt.Println(product)
+}
+```

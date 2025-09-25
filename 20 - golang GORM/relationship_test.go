@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
 
@@ -272,6 +273,114 @@ func TestPreloadManyToMany(t *testing.T) {
 	/*
 		=== RUN   TestPreloadManyToMany
 		--- PASS: TestPreloadManyToMany (0.00s)
+		PASS
+	*/
+}
+
+func TestAssociationFind(t *testing.T) {
+	// Cari product tanpa users
+	var product Product
+	err := db.First(&product, "id = ?", "P001").Error
+	assert.Nil(t, err)
+	// fmt.Println(product)
+
+	// Cari user yang menyukai product tersebut
+	var users []User
+	err = db.Model(&product).
+		Where("first_name LIKE ?", "User%").
+		Association("LikedByUsers").
+		Find(&users)
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(users))
+
+	/*
+		=== RUN   TestAssociationFind
+		--- PASS: TestAssociationFind (0.00s)
+		PASS
+	*/
+}
+
+func TestAssociationAdd(t *testing.T) {
+	// Mengambil User dengan ID 3
+	var user User
+	err := db.First(&user, "id = ?", "3").Error
+	assert.Nil(t, err)
+
+	// Mengambil Product dengan ID P001
+	var product Product
+	err = db.First(&product, "id = ?", "P001").Error
+	assert.Nil(t, err)
+
+	// Menambahkan Data ke tabel user_like_product dengan Product ID P001 dan User ID 3
+	err = db.Model(&product).Association("LikedByUsers").Append(&user)
+	assert.Nil(t, err)
+
+	/*
+		=== RUN   TestAssociationAdd
+		--- PASS: TestAssociationAdd (0.01s)
+		PASS
+	*/
+}
+
+func TestAssociationReplace(t *testing.T) {
+	err := db.Transaction(func(tx *gorm.DB) error {
+		var user User
+		err := tx.First(&user, "id = ?", "1").Error
+		assert.Nil(t, err)
+		fmt.Println(user)
+
+		wallet := Wallet{
+			ID:      "01",
+			UserId:  "1",
+			Balance: 2000000,
+		}
+
+		err = tx.Model(&user).Association("Wallet").Replace(&wallet)
+		return err
+	})
+
+	assert.Nil(t, err)
+
+	/*
+		=== RUN   TestAssociationReplace
+		--- FAIL: TestAssociationReplace (0.01s)
+		FAIL
+	*/
+}
+
+func TestAssociationDelete(t *testing.T) {
+	var user User
+	err := db.First(&user, "id = ?", "3").Error
+	assert.Nil(t, err)
+
+	var product Product
+	err = db.First(&product, "id = ?", "P001").Error
+	assert.Nil(t, err)
+
+	// Hapus user_id = 3 dan product_id = P001 di tabel user_like_product
+	err = db.Model(&product).Association("LikedByUsers").Delete(&user)
+	assert.Nil(t, err)
+
+	/*
+		=== RUN   TestAssociationDelete
+		--- PASS: TestAssociationDelete (0.01s)
+		PASS
+	*/
+}
+
+func TestAssocationClear(t *testing.T) {
+	var product Product
+	err := db.First(&product, "id = ?", "P001").Error
+	assert.Nil(t, err)
+
+	// Hapus semua data pada tabel user_like_product dengan product_id = P001
+	err = db.Model(&product).Association("LikedByUsers").Clear()
+	assert.Nil(t, err)
+	fmt.Println(product)
+
+	/*
+		=== RUN   TestAssocationClear
+		--- PASS: TestAssocationClear (0.00s)
 		PASS
 	*/
 }
