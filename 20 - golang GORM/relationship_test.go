@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"testing"
 	"time"
@@ -523,6 +524,23 @@ func TestGroupByHaving(t *testing.T) {
 	/*
 		=== RUN   TestGroupByHaving
 		--- PASS: TestGroupByHaving (0.01s)
+		PASS
+	*/
+}
+
+func TestContext(t *testing.T) {
+	ctx := context.Background()
+
+	var users []User
+	err := db.WithContext(ctx).
+		Find(&users).Error
+
+	assert.Nil(t, err)
+	assert.Equal(t, 17, len(users))
+
+	/*
+		=== RUN   TestContext
+		--- PASS: TestContext (0.00s)
 		PASS
 	*/
 }

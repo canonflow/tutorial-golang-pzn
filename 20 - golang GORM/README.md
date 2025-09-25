@@ -1998,3 +1998,26 @@ func TestGroupByHaving(t *testing.T) {
     assert.Equal(t, 1, len(result))
 }
 ```
+
+---
+
+## Context
+
+- Saat kita menggunakan Golang, biasanya kita akan menggunakan `context.Context`.
+- Bagaimana dengan GORM? Dari awal kita belum pernah menggunakan `Context`.
+- GORM juga mendukung penggunaan `Context`, kita bisa menggunakan method `WithContext()` ketika mau melakukan operasi menggunakan GORM.
+
+### Kode: Context
+
+```go
+func TestContext(t *testing.T) {
+    ctx := context.Background()
+
+    var users []User
+    err := db.WithContext(ctx).
+        Find(&users).Error
+
+    assert.Nil(t, err)
+    assert.Equal(t, 17, len(users))
+}
+```
