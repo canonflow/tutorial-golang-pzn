@@ -105,3 +105,25 @@ func TestList(t *testing.T) {
     client.Del(ctx, "names")
 }
 ```
+
+---
+
+## Set
+
+- Kita dapat menggunakan struktur data `Set` di Golang Redis.
+
+### Kode: Set
+
+```go
+func TestSet(t *testing.T) {
+    client.SAdd(ctx, "students", "nathan")
+    client.SAdd(ctx, "students", "nathan")
+    client.SAdd(ctx, "students", "garzya")
+    client.SAdd(ctx, "students", "garzya")
+    client.SAdd(ctx, "students", "santoso")
+    client.SAdd(ctx, "students", "santoso")
+
+    assert.Equal(t, int64(3), client.SCard(ctx, "students").Val())
+    assert.Equal(t, []string{"nathan", "garzya", "santoso"}, client.SMembers(ctx, "students").Val())
+}
+```

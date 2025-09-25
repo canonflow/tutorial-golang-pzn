@@ -77,3 +77,21 @@ func TestList(t *testing.T) {
 		PASS
 	*/
 }
+
+func TestSet(t *testing.T) {
+	client.SAdd(ctx, "students", "nathan")
+	client.SAdd(ctx, "students", "nathan")
+	client.SAdd(ctx, "students", "garzya")
+	client.SAdd(ctx, "students", "garzya")
+	client.SAdd(ctx, "students", "santoso")
+	client.SAdd(ctx, "students", "santoso")
+
+	assert.Equal(t, int64(3), client.SCard(ctx, "students").Val())
+	assert.Equal(t, []string{"nathan", "garzya", "santoso"}, client.SMembers(ctx, "students").Val())
+
+	/*
+		=== RUN   TestSet
+		--- PASS: TestSet (0.02s)
+		PASS
+	*/
+}
