@@ -1,0 +1,11 @@
+version: "3.9"
+
+services:
+  pzn_golang_redis:
+    image: redis:8.2.1
+    container_name: pzn_golang_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis_data:/data
+    restart: unless-stopped
