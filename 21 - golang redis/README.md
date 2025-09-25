@@ -256,3 +256,26 @@ func TestPipeline(t *testing.T) {
     assert.Equal(t, "Indonesia", client.Get(ctx, "address").Val())
 }
 ```
+
+---
+
+## Transaction
+
+- Kita tahu bahwa menggunakan Redis bisa melakukan transaction menggunakan perintah `MULTI` dan `COMMIT`. Namun **harus dalam koneksi yang sama**.
+- Karena Golang Redis melakukan maintain **connection pool** secara **internal**, jadi kita **tidak bisa dengan mudah** menggunakan `MULTI` dan `COMMIT` menggunakan `client.Redis`.
+- Kita harus menggunakan function `TxPipelined()`, dimana di dalamnya kita bisa membuat `callback` function **yang berisi command-command** yang akan dijalankan **dalam transaction**.
+
+### Kode: Transaction
+
+```go
+func TestTransaction(t *testing.T) {
+    client.TxPipelined(ctx, func(pipeliner redis.Pipeliner) error {
+        pipeliner.SetEx(ctx, "name", "Nathan", time.Second * 5)
+        pipeliner.SetEx(ctx, "address", "Surabaya", time.Second * 5)
+        return nil
+    })
+
+    assert.Equal(t, "Nathan", client.Get(ctx, "name").Val())
+    assert.Equal(t, "Surabaya", client.Get(ctx, "address").Val())
+}
+```

@@ -196,3 +196,20 @@ func TestPipeline(t *testing.T) {
 		PASS
 	*/
 }
+
+func TestTransaction(t *testing.T) {
+	client.TxPipelined(ctx, func(pipeliner redis.Pipeliner) error {
+		pipeliner.SetEx(ctx, "name", "Nathan", time.Second*5)
+		pipeliner.SetEx(ctx, "address", "Surabaya", time.Second*5)
+		return nil
+	})
+
+	assert.Equal(t, "Nathan", client.Get(ctx, "name").Val())
+	assert.Equal(t, "Surabaya", client.Get(ctx, "address").Val())
+
+	/*
+		=== RUN   TestTransaction
+		--- PASS: TestTransaction (0.02s)
+		PASS
+	*/
+}
