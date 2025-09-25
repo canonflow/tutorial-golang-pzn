@@ -2056,3 +2056,28 @@ func TestScopes(t *testing.T) {
     assert.Nil(t, err)
 }
 ```
+
+---
+
+## Connection Pool
+
+- Saat kita belajar di Kelas [Golang Database](https://github.com/canonflow/tutorial-golang-pzn/tree/main/07%20-%20golang%20mysql), kita belajar tentang Pool, dimana Golang mengatur mantain koneksi yang terbuka dan tertutup secara otomatis.
+- Kita hanya cukup menggunakan saja, tanpa harus pusing mengaturnya.
+- Bagaimana dengan GORM?
+- GORM sendiri sebenarnya di dalamnya tetap menggunakan `sql.DB`.
+- Jadi jika kita ingin mengubah pengaturan Pool-nya, kita bisa menggunakan `sql.DB`.
+
+### Kode: Connection Pool
+
+```go
+sqlDb, err := db.DB()
+
+if err != nil {
+    panic(err)
+}
+
+sqlDB.SetMaxOpenConns(100)
+sqlDB.SetMaxIdleConns(10)
+sqlDB.SetConnMaxLifetime(30 * time.Minute)
+sqlDB.SetConnMaxIdleTime(5 * time.Minute)
+```
