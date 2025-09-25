@@ -2021,3 +2021,38 @@ func TestContext(t *testing.T) {
     assert.Equal(t, 17, len(users))
 }
 ```
+
+---
+
+## Scopes
+
+- Sebelumnya kita sudah pernah menggunakan method `Scopes()`.
+- Method `Scopes()` juga **bisa digunakan untuk menambahkan custom logic** yang mungkin sering kita gunakan.
+- Kita cukup menambahkan `function(*gorm.DB) *gorm.DB`
+
+### Kode: Sample Function
+
+```go
+func BrokeWalletBalance(db *gorm.DB) *gorm.DB {
+    return db.Where("balance = ?", 0)
+}
+
+func SultanWalletBalance(db *gorm.DB) *gorm.DB {
+    return db.Where("balance > ?", 1000000)
+}
+```
+
+### Kode: Scopes
+
+```go
+func TestScopes(t *testing.T) {
+    var wallets []Wallet
+
+    err := db.Scopes(BrokeWalletBalance).Find(&wallets).Error
+    assert.Nil(t, err)
+
+    wallets = []Wallet{}
+    err = db.Scopes(SultanWalletBalance).Find(&wallets).Error
+    assert.Nil(t, err)
+}
+```

@@ -544,3 +544,28 @@ func TestContext(t *testing.T) {
 		PASS
 	*/
 }
+
+func BrokeWalletBalance(db *gorm.DB) *gorm.DB {
+	return db.Where("balance = ?", 0)
+}
+
+func SultanWalletBalance(db *gorm.DB) *gorm.DB {
+	return db.Where("balance > ?", 1000000)
+}
+
+func TestScopes(t *testing.T) {
+	var wallets []Wallet
+
+	err := db.Scopes(BrokeWalletBalance).Find(&wallets).Error
+	assert.Nil(t, err)
+
+	wallets = []Wallet{}
+	err = db.Scopes(SultanWalletBalance).Find(&wallets).Error
+	assert.Nil(t, err)
+
+	/*
+		=== RUN   TestScopes
+		--- PASS: TestScopes (0.00s)
+		PASS
+	*/
+}
