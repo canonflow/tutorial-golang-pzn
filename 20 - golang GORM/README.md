@@ -2191,3 +2191,76 @@ func TestUserHook(t *testing.T) {
     assert.NotEqual(t, "", user.ID)
 }
 ```
+
+---
+
+## Performance
+
+- GORM sendiri **sebenarnya sudah di-optimize** agar performanya baik.
+- Jadi **secara default**, GORM sudah baik jika kita gunakan untuk membuat aplikasi.
+- Tapi berikut kita bahas **beberapa tips** yang bisa kita lakukan lagi **ketika ingin meningkatkan performa aplikasi** kita ketika menggunakan GORM.
+
+### 01. Matikan Auto Transaction
+
+- **Secara default**, ketika kita melakukan Create, Update, Delete, **semua akan dijalankan dalam Transaction**, walaupun kita tidak melakukannya.
+- Kita **bisa mematikan fitur Auto Transaction** ini jika kita mau.
+- Kita bisa **ubah config** ketika membuat `gorm.DB` dengan menambahkan `SkipDefaultTransaction` menjadi `true`.
+- **Dengan mematikan fitur ini**, kita **harus melakukan** transaction **secara manual**.
+
+### Kode: Mematikan Auto Transaction
+
+```go
+func OpenConnection() *gorm.DB {
+    dialect := mysql.Open("root:@tcp(localhost:3306)/belajar_golang_gorm")
+    db, err := gorm.Open(dialect, &gorm.Config{
+        Logger: logger.Default.LogMode(logger.Info),
+        SkipDefaultTransaction: true,
+    })
+
+    if err != nil {
+        panic(err)
+    }
+}
+```
+
+### 02. Cache Prepared Statement
+
+- **Secara default** saat GORM **membuat Query menggunakan Prepare Statement**, dia **tidak akan menyimpan** SQL Query nya **di memory**.
+- Kita **bisa mengaktifkan fitur ini**, agar Prepare Statement **disimpan di memory**, sehingga **ketika kita sering menggunakan Query yang sama**, GORM **tidak perlu membuat** Prepare Statement nya lagi, **cukup menggunakan yang sudah dibuat** di memory.
+- Kita bisa aktifkan fitur ini di config dengan nama `PrepareStmt`.
+
+### Kode: Cache Prepared Statement
+
+```go
+func OpenConnection() *gorm.DB {
+    dialect := mysql.Open("root:@tcp(localhost:3306)/belajar_golang_gorm")
+    db, err := gorm.Open(dialect, &gorm.Config{
+        Logger:                 logger.Default.LogMode(logger.Info),
+		SkipDefaultTransaction: true,
+		PrepareStmt:            true,
+    })
+
+    if err != nil {
+        panic(err)
+    }
+}
+```
+
+### 03. Select Fields
+
+- Secara **default**, saat kita menggunakan GORM, **semua field di Model akan di select**.
+- Ketika kita **hanya butuh beberapa saja**, **tidak disarankan untuk melakukan select semua** field, apalagi memang field nya tidak kita butuhkan.
+- Sangat **disarankan untuk memilih field** mana yang mau kita select menggunakan method `Select()`.
+- Seperti yang pernah kita bahas di materi-materi sebelumnya
+
+### 04. Large Result
+
+- Saat kita **melakukan query Find() ke Slice**, secara **default** GORM akan **mengambil seluruh data** dan **menyimpannya di dalam Slice**.
+- **Baik** semua isi Slice mau **kita baca atau tidak**, hal ini **kadang tidak optimal** jika **ukuran hasil query nya besar**.
+- **Disarankan** untuk **menggunakan Lazy Result menggunakan** `Rows()` jika memang kita **ingin melakukan Query** dengan jumlah **hasil yang besar**, sehingga kita bisa ambil data yang dibutuhkan saja, **tanpa harus menyimpan semuanya ke memory**.
+
+### 05. Table Split
+
+- Jika **Model** yang kita buat **terlalu banyak field nya**, maka secara **default** **semua field akan di Query** oleh GORM.
+- Pada **kasus seperti ini**, **selain** kita bisa **Select field nya satu per satu**, kita juga **bisa coba Split Model nya menjadi relasi One to One**.
+- Sehingga kita **cukup Query pada data yang kita butuhkan**, contoh sebelumnya kita melakukan **Split Tabel** antara Model `User` dan Model `Wallet`.
