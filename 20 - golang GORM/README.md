@@ -2117,3 +2117,77 @@ func TestMigrator(t *testing.T) {
     assert.Nil(t, err)
 }
 ```
+
+---
+
+## Hook
+
+- GORM memiliki fitur bernama Hook
+- Hook adalah function di dalam Model yang akan dipanggil sebelum melakukan operasi `create` / `query` / `update` / `delete`.
+- Jika function Hook tersebut mengembalikan `error`, secara otomatis GORM akan menghentikan operasi-nya.
+- Function `Hook` menggunakan struktur:
+  - `func(*gorm.DB) error`
+
+### Hook untuk Create
+
+1. // Begin Transaction
+1. `BeforeSave()`
+1. `BeforeCreate()`
+1. // Save BEFORE Associations
+1. // Insert into Database
+1. // Save AFTER Associations
+1. `AfterCreate()`
+1. `AfterSave()`
+1. // Commit or Rollback Transaction
+
+### Hook untuk Update
+
+1. // Begin Transaction
+1. `BeforeSave()`
+1. `BeforeUpdate()
+1. // Save BEFORE Associations
+1. // Update Database
+1. // Save AFTer Associations
+1. `AfterUpdate()`
+1. `AfterSave()`
+1. // Commit or Rollback Transaction
+
+### Hook untuk Delete
+
+1. // Begin Transaction
+1. `BeforeDelete()
+1. // Delete From Database
+1. `AfterDelete()`
+1. // Commit or Rollback Transaction
+
+### Hook untuk Find
+
+1. // Load Data from Database
+1. // Preloading (eager loading)
+1. `AfterFind()`
+
+### Kode: User.BeforeCreate()
+
+```go
+func (u *User) BeforeCreate(db *gorm.DB) error {
+    if u.ID == "" {
+        u.ID = "user-" + time.Now().Format("20060102150405")
+    }
+
+    return nil
+}
+
+func TestUserHook(t *testing.T) {
+    user := User{
+        Password: "rahasia",
+        Name: Name{
+            FirstName: "User 100",
+        },
+    }
+
+    err := db.Create(&user).Error
+    assert.Nil(t, err)
+    assert.NotNil(t, user.ID)
+    assert.NotEqual(t, "", user.ID)
+}
+```
