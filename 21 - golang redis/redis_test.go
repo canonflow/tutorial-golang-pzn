@@ -59,3 +59,21 @@ func TestString(t *testing.T) {
 		PASS
 	*/
 }
+
+func TestList(t *testing.T) {
+	client.RPush(ctx, "names", "nathan")
+	client.RPush(ctx, "names", "garzya")
+	client.RPush(ctx, "names", "santoso")
+
+	assert.Equal(t, "nathan", client.LPop(ctx, "names").Val())
+	assert.Equal(t, "garzya", client.LPop(ctx, "names").Val())
+	assert.Equal(t, "santoso", client.LPop(ctx, "names").Val())
+
+	client.Del(ctx, "names")
+
+	/*
+		=== RUN   TestList
+		--- PASS: TestList (0.02s)
+		PASS
+	*/
+}
