@@ -1928,3 +1928,73 @@ func TestJoinQueryCondition(t *testing.T) {
     assert.Equal(t, 3, len(users))
 }
 ```
+
+---
+
+## Query Aggregation
+
+- Ada banyak **Query Aggregation** yang biasanya tersedia di Database.
+- Di GORM, hanya menyediakan method `Aggregation` untuk **Count** saja.
+- Jika kita ingin melakukan Aggregation misal `Avg`, `Sum`, `Max`, dan lainnnya, maka kita **harus melakukan secara manual** menggunakan `Select()`.
+
+### Kode: Count Aggregation
+
+```go
+func TestCount(t *testing.T) {
+    var count int64
+
+    err := db.Model(&User{}).
+        Joins("Wallet").
+        Where("Wallet.balance > ?", 500000).
+        Count(&count).Error
+
+    assert.Nil(t, err)
+    assert.Equal(t, int64(3), count)
+}
+```
+
+### Kode: Other Aggregation
+
+```go
+type AggregationResult struct {
+    TotalBalance int64
+    MinBalance int64
+    MaxBalance int64
+    AvgBalance float64
+}
+
+func TestOtherAggregation(t *testing.T) {
+    var result AggregationResult
+
+    err := db.Model(&Wallet{}).
+        Select("SUM(balance) as total_balance", "MIN(balance) as min_balance", "MAX(balance) as max_balance", "AVG(balance) as avg_balance").
+        Take(&result).Error
+
+    assert.Nil(t, err)
+    assert.Equal(t, int64(4000000), result.TotalBalance)
+    assert.Equal(t, int64(1000000), result.MinBalance)
+    assert.Equal(t, int64(3000000), result.MaxBalance)
+    assert.Equal(t, float64(1333333.3333), result.AvgBalance)
+}
+```
+
+### Group By and Having
+
+- GORM juga menyediakan method untuk melakukan **Group By** menggunakan method `Group()` dan untuk melakukan **Having** menggunakan method `Having()`.
+
+### Kode: Group By and Having
+
+```go
+func TestGroupByHaving(t *testing.T) {
+    var result []AggregationResult
+
+    err := db.Model(&Wallet{}).
+        Select("SUM(balance) as total_balance", "MIN(balance) as min_balance", "MAX(balance) as max_balance", "AVG(balance) as avg_balance").
+        Joins("User").
+        Group("User.id").
+        Having("SUM(balance) > ?", 1000000).
+        Find(&result).Error
+    assert.Nil(t, err)
+    assert.Equal(t, 1, len(result))
+}
+```
