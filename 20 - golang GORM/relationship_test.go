@@ -384,3 +384,44 @@ func TestAssocationClear(t *testing.T) {
 		PASS
 	*/
 }
+
+func TestPreloadingWithCondition(t *testing.T) {
+	var user User
+
+	err := db.Preload("Wallet", "balance > ?", 1000000).First(&user, "id = ?", "1").Error
+	assert.Nil(t, err)
+	fmt.Println(user)
+
+	/*
+		=== RUN   TestPreloadingWithCondition
+		--- PASS: TestPreloadingWithCondition (0.00s)
+		PASS
+	*/
+}
+
+func TestNestedPreloading(t *testing.T) {
+	var wallet Wallet
+	err := db.Preload("User.Addresses").Find(&wallet, "id = ? ", "1").Error
+	assert.Nil(t, err)
+	fmt.Println(wallet)
+
+	/*
+		=== RUN   TestNestedPreloading
+		--- PASS: TestNestedPreloading (0.00s)
+		PASS
+	*/
+}
+
+func TestPreloadAll(t *testing.T) {
+	var user User
+	err := db.Preload(clause.Associations).First(&user, "id = ?", "1").Error
+	assert.Nil(t, err)
+
+	fmt.Println(user)
+
+	/*
+		=== RUN   TestPreloadAll
+		--- PASS: TestPreloadAll (0.00s)
+		PASS
+	*/
+}

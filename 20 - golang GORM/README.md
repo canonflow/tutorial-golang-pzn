@@ -1831,3 +1831,54 @@ func TestAssocationClear(t *testing.T) {
     fmt.Println(product)
 }
 ```
+
+---
+
+## Preloading
+
+- Sebelumnya kita sudah tahu bahwa untuk melakukan loading relasi, kita bisa menggunakan `Preloading()`.
+- Bagaimana jika kita ingin menambahkan kondisi ketika melakukan `Preloading`?
+- Kita bisa tambahkan `Inline Condition` ketika melakukan **Preloading**.
+
+### Kode: Preloading with Condition
+
+```go
+func TestPreloadingWithCondition(t *testing.T) {
+    var user User
+
+    err := db.Preload("Wallet", "balance > ?", 1000000).First(&user, "id = ?", "1").Error
+    assert.Nil(t, err)
+    fmt.Println(user)
+}
+```
+
+### Nested Preloading
+
+- Preloading juga bisa dilakukan untuk relasi yang **Nested**.
+- Misal kita akan melakukan query untuk Model `Wallet`, kita ingin melakukan **Preload** ke `User` dan juga ke `Address`-nya.
+- Kita bisa gunakan `Preloading` dengan menggunakan `.` (titik), misal `User.Addresses`.
+
+### Kode: Nested Preloading
+
+```go
+func TestNestedPreloading(t *testing.T) {
+    var wallet Wallet
+    err := db.Preload("User.Addresses").Find(&wallet, "id = ? ", "1").Error
+    assert.Nil(t, err)
+}
+```
+
+### Preload All
+
+- Jika kita ingin melakukan `Preload` **semua relasi** di Model, kita bisa menggunakan `clauses.Associations` ketika melakukan `Preloading()`.
+- Namun perli diingat, bahwa **Preload All** **tidak akan melakukan load** `Nested Relation`.
+
+### Kode: Preload All
+
+```go
+func TestPreloadAll(t *testing.T) {
+    var user User
+    err := db.Preload(clause.Associations).First(&user, "id = ?", "1").Error
+    assert.Nil(t, err)
+}
+```
