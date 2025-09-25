@@ -179,3 +179,20 @@ func TestHyperLogLog(t *testing.T) {
 		PASS
 	*/
 }
+
+func TestPipeline(t *testing.T) {
+	client.Pipelined(ctx, func(pipeliner redis.Pipeliner) error {
+		pipeliner.SetEx(ctx, "name", "Nathan", time.Second*5)
+		pipeliner.SetEx(ctx, "address", "Indonesia", time.Second*5)
+		return nil
+	})
+
+	assert.Equal(t, "Nathan", client.Get(ctx, "name").Val())
+	assert.Equal(t, "Indonesia", client.Get(ctx, "address").Val())
+
+	/*
+		=== RUN   TestPipeline
+		--- PASS: TestPipeline (0.02s)
+		PASS
+	*/
+}

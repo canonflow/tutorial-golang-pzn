@@ -233,3 +233,26 @@ func TestHyperLogLog(t *testing.T) {
     assert.Equal(t, int64(6), client.PFCount(ctx, "visitors").Val())
 }
 ```
+
+---
+
+## Pipeline
+
+- Di Kelas Redis, kita pernah belajar tentang `pipeline`, dimana kita bisa **mengirim beberapa perintah** secara langsung **tanpa harus menunggu balasan satu per satu** dari Redis.
+- Hal ini juga bisa dilakukan menggunakan Golang Redis menggunakan `Client.Pipelined(callback)`.
+- Di dalam `callback`, kita bisa **melakukan semua command** yang akan **dijalankan dalam pipeline**.
+
+### Kode: Pipeline
+
+```go
+func TestPipeline(t *testing.T) {
+    client.Pipelined(ctx, func(pipeliner redis.Pipeliner) error {
+        pipeliner.SetEx(ctx, "name", "Nathan", time.Second * 5)
+        pipeliner.SetEx(ctx, "address", "Indonesia", time.Second * 5)
+        return nil
+    })
+
+    assert.Equal(t, "Nathan", client.Get(ctx, "name").Val())
+    assert.Equal(t, "Indonesia", client.Get(ctx, "address").Val())
+}
+```
