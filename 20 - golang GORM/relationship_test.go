@@ -425,3 +425,40 @@ func TestPreloadAll(t *testing.T) {
 		PASS
 	*/
 }
+
+func TestJoinQuery(t *testing.T) {
+	var users []User
+	err := db.Joins("join wallets on wallets.user_id = users.id").Find(&users).Error
+	assert.Nil(t, err)
+	assert.Equal(t, 3, len(users))
+
+	users = []User{}
+	err = db.Joins("Wallet").Find(&users).Error // Using Left Join
+	assert.Nil(t, err)
+	assert.Equal(t, 17, len(users))
+
+	/*
+		=== RUN   TestJoinQuery
+		--- PASS: TestJoinQuery (0.01s)
+		PASS
+	*/
+}
+
+func TestJoinQueryCondition(t *testing.T) {
+	var users []User
+	err := db.Joins("join wallets on wallets.user_id = users.id AND wallets.balance > ?", 500000).Find(&users).Error
+
+	assert.Nil(t, err)
+	assert.Equal(t, 3, len(users))
+
+	users = []User{}
+	err = db.Joins("Wallet").Where("Wallet.balance > ?", 500000).Find(&users).Error // Alias menggunakan nama field
+	assert.Nil(t, err)
+	assert.Equal(t, 3, len(users))
+
+	/*
+		=== RUN   TestJoinQueryCondition
+		--- PASS: TestJoinQueryCondition (0.00s)
+		PASS
+	*/
+}

@@ -1882,3 +1882,49 @@ func TestPreloadAll(t *testing.T) {
     assert.Nil(t, err)
 }
 ```
+
+---
+
+## Joins
+
+- Sebelumnya kita sudah melakukan `Joins()` dengan menyebutkan nama field Relation-nya.
+- Selaing menggunakan nama Relation, kita juga **bisa menggunakan Query manual** ketika melakukan `Joins`.
+- Bedanya adalah, **kolom Relation-nya tidak akan di Query**.
+
+### Kode: Join Query
+
+```go
+func TestJoinQuery(t *testing.T) {
+    var user []User
+    err := db.Joins("join wallets on wallets.user_id = users.id").Find(&users).Error
+    assert.Nil(t, err)
+    assert.Equal(t, 3, len(users))
+
+    users = []User{}
+    err = db.Joins("Wallet").Find(&users).Error // Using Left Join
+    assert.Nil(t, err)
+    assert.Equal(t, 17, len(users))
+}
+```
+
+### Join Condition
+
+- Saat menggunakan `Joins`, ketika kita ingin menambahkan kondisi di Join Table-nya, **jangan lupa untuk menyebutkan nama tabel-nya**.
+- Namun saat menggunakan `Joins()` **menggunakan nama relasi**, **secara otomatis** GORM akan **membuat alias** untuk nama relasi, jadi **kita harus menggunakan nama relasi ketika menambahkan kondisi**.
+
+### Kode: Join Condition
+
+```go
+func TestJoinQueryCondition(t *testing.T) {
+    var users []User
+    err := db.Joins("join wallets on wallets.user_id = users.id AND wallets.balance > ?", 500000).Find(&users).Error
+
+    assert.Nil(t, err)
+    assert.Equal(t, 3, len(users))
+
+    users = []User{}
+    err = db.Joins("Wallet").Where("Wallet.balance > ?", 500000).Find(&users).Error // Alias menggunakan nama field
+    assert.Nil(t, err)
+    assert.Equal(t, 3, len(users))
+}
+```
