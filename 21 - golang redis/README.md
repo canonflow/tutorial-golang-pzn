@@ -172,3 +172,46 @@ func TestHash(t *testing.T) {
     client.Del(ctx, "user:1")
 }
 ```
+
+---
+
+## Geo Point
+
+- Kita dapat menggunakan struktur data `Geo Point` di Golang Redis.
+
+### Kode: Menambahkan Geo Point
+
+```go
+func TestGeoPoint(t *testing.T) {
+    client.GeoAdd(ctx, "sellers", &redis.GeoLocation{
+        Name: "Toko A",
+        Longitude: 106.822702,
+        Latitude: -6.177590,
+    })
+    client.GeoAdd(ctx, "sellers", &redis.GeoLocation{
+        Name: "Toko B",
+        Longitude: 106.820889,
+        Latitude: -6.174964,
+    })
+}
+```
+
+### Kode: Mencari Geo Point
+
+```go
+func TestGeoPoint(t *testing.T) {
+    // ......
+
+    assert.Equal(t, 0.3543, client.GeoDist(ctx, "sellers", "Toko A", "Toko B", "km").Val())
+    fmt.Println(client.GeoDist(ctx, "sellers", "Toko A", "Toko B", "km").Val())
+
+    sellers := client.GeoSearch(ctx, "sellers", &redis.GeoSearchQuery{
+        Longitude: 106.821825,
+        Latitude: -6.175105,
+        Radius: 5,
+        RadiusUnit: "km",
+    }).Val()
+
+    assert.Equal(t, []string{"Toko A", "Toko B"}, sellers)
+}
+```

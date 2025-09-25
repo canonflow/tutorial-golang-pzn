@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
@@ -124,4 +125,43 @@ func TestHash(t *testing.T) {
 	assert.Equal(t, "nathan@example.com", user["email"])
 
 	client.Del(ctx, "user:1")
+
+	/*
+		=== RUN   TestHash
+		--- PASS: TestHash (0.02s)
+		PASS
+	*/
+}
+
+func TestGeoPoint(t *testing.T) {
+	// TODO: Menambahkan Geo Point
+	client.GeoAdd(ctx, "sellers", &redis.GeoLocation{
+		Name:      "Toko A",
+		Longitude: 106.822702,
+		Latitude:  -6.177590,
+	})
+	client.GeoAdd(ctx, "sellers", &redis.GeoLocation{
+		Name:      "Toko B",
+		Longitude: 106.820889,
+		Latitude:  -6.174964,
+	})
+
+	// TODO: Mencari Geo Point
+	assert.Equal(t, 0.3543, client.GeoDist(ctx, "sellers", "Toko A", "Toko B", "km").Val())
+	fmt.Println(client.GeoDist(ctx, "sellers", "Toko A", "Toko B", "km").Val())
+
+	sellers := client.GeoSearch(ctx, "sellers", &redis.GeoSearchQuery{
+		Longitude:  106.821825,
+		Latitude:   -6.175105,
+		Radius:     5,
+		RadiusUnit: "km",
+	}).Val()
+
+	assert.Equal(t, []string{"Toko A", "Toko B"}, sellers)
+
+	/*
+		=== RUN   TestGeoPoint
+		--- PASS: TestGeoPoint (0.02s)
+		PASS
+	*/
 }
