@@ -279,3 +279,55 @@ func TestTransaction(t *testing.T) {
     assert.Equal(t, "Surabaya", client.Get(ctx, "address").Val())
 }
 ```
+
+---
+
+## Stream
+
+- Kita dapat menggunakan struktur data `Stream` di Golang Redis.
+
+### Kode: Publish Stream
+
+```go
+func TestPublishStream(t *testing.T) {
+    for i := 0; i < 10; i++ {
+        client.XAdd(ctx, &redis.XAddArgs{
+            Stream: "members",
+            Values: map[string]interface{}{
+                "name": "Nathan",
+                "address": "Indonesia",
+            },
+        })
+    }
+}
+```
+
+### Kode: Create Consumer
+
+```go
+func TestCreateConsumer(t *testing.T) {
+    client.XGroupCreate(ctx, "members", "group-1", "0")
+    client.XGroupCreateConsumer(ctx, "members", "group-1", "consumer-1")
+    client.XGroupCreateConsumer(ctx, "members", "group-1", "consumer-2")
+}
+```
+
+### Kode: Get Stream
+
+```go
+func TestGetStream(t *testing.T) {
+    result := client.XReadGroup(ctx, &redis.XReadGroupArgs{
+        Group: "group-1",
+        Consumer: "consumer-1",
+        Streams: []string{"members", ">"},
+        Count: 2,
+        Block: time.Second * 5,
+    }).Val()
+
+    for _, stream := range result {
+        for _, message := range stream.Messages {
+            fmt.Println(message.Values)
+        }
+    }
+}
+```

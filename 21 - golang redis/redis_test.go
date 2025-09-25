@@ -213,3 +213,60 @@ func TestTransaction(t *testing.T) {
 		PASS
 	*/
 }
+
+func TestPublishStream(t *testing.T) {
+	for i := 0; i < 10; i++ {
+		client.XAdd(ctx, &redis.XAddArgs{
+			Stream: "members",
+			Values: map[string]interface{}{
+				"name":    "Nathan",
+				"address": "Indonesia",
+			},
+		})
+	}
+
+	/*
+		=== RUN   TestPublishStream
+		--- PASS: TestPublishStream (0.02s)
+		PASS
+	*/
+}
+
+func TestCreateConsumer(t *testing.T) {
+	client.XGroupCreate(ctx, "members", "group-1", "0")
+	client.XGroupCreateConsumer(ctx, "members", "group-1", "consumer-1")
+	client.XGroupCreateConsumer(ctx, "members", "group-1", "consumer-2")
+
+	/*
+		=== RUN   TestCreateConsumer
+		--- PASS: TestCreateConsumer (0.02s)
+		PASS
+	*/
+}
+
+func TestGetStream(t *testing.T) {
+	result := client.XReadGroup(ctx, &redis.XReadGroupArgs{
+		Group:    "group-1",
+		Consumer: "consumer-1",
+		Streams:  []string{"members", ">"},
+		Count:    2,
+		Block:    time.Second * 5,
+	}).Val()
+
+	for _, stream := range result {
+		for _, message := range stream.Messages {
+			fmt.Println(message.Values)
+
+			/*
+				map[address:Indonesia name:Nathan]
+				map[address:Indonesia name:Nathan]
+			*/
+		}
+	}
+
+	/*
+		=== RUN   TestGetStream
+		--- PASS: TestGetStream (0.01s)
+		PASS
+	*/
+}
