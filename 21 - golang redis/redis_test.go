@@ -112,3 +112,16 @@ func TestSortedSet(t *testing.T) {
 		PASS
 	*/
 }
+
+func TestHash(t *testing.T) {
+	client.HSet(ctx, "user:1", "id", "1")
+	client.HSet(ctx, "user:1", "name", "nathan")
+	client.HSet(ctx, "user:1", "email", "nathan@example.com")
+
+	user := client.HGetAll(ctx, "user:1").Val()
+	assert.Equal(t, "1", user["id"])
+	assert.Equal(t, "nathan", user["name"])
+	assert.Equal(t, "nathan@example.com", user["email"])
+
+	client.Del(ctx, "user:1")
+}
