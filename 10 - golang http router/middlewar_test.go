@@ -10,24 +10,36 @@ import (
 	"testing"
 )
 
-func TestRouter(t *testing.T) {
+type LogMiddleware struct {
+	Handler http.Handler
+}
+
+func (middleware *LogMiddleware) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
+	fmt.Println("Receive Request")
+	middleware.Handler.ServeHTTP(writer, request)
+}
+
+func TestMiddleware(t *testing.T) {
 	router := httprouter.New()
 	router.GET("/", func(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-		fmt.Fprint(writer, "Hello Get")
+		fmt.Fprint(writer, "Middleware")
 	})
+
+	middleware := LogMiddleware{Handler: router}
 
 	request := httptest.NewRequest(http.MethodGet, "/", nil)
 	recorder := httptest.NewRecorder()
 
-	router.ServeHTTP(recorder, request)
+	middleware.ServeHTTP(recorder, request)
 	response := recorder.Result()
 
 	body, _ := io.ReadAll(response.Body)
 
-	assert.Equal(t, "Hello Get", string(body))
+	assert.Equal(t, "Middleware", string(body))
 	/*
-		=== RUN   TestRouter
-		--- PASS: TestRouter (0.00s)
+		=== RUN   TestMiddleware
+		Receive Request
+		--- PASS: TestMiddleware (0.00s)
 		PASS
 	*/
 }

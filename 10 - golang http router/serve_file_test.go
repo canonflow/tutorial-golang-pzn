@@ -1,22 +1,25 @@
 package main
 
 import (
-	"fmt"
+	"embed"
 	"github.com/julienschmidt/httprouter"
 	"github.com/stretchr/testify/assert"
 	"io"
+	"io/fs"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 )
 
-func TestRouter(t *testing.T) {
-	router := httprouter.New()
-	router.GET("/", func(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-		fmt.Fprint(writer, "Hello Get")
-	})
+//go:embed resources
+var resources embed.FS
 
-	request := httptest.NewRequest(http.MethodGet, "/", nil)
+func TestServerFile(t *testing.T) {
+	router := httprouter.New()
+	directory, _ := fs.Sub(resources, "resources")
+	router.ServeFiles("/files/*filepath", http.FS(directory))
+
+	request := httptest.NewRequest(http.MethodGet, "/files/hello.txt", nil)
 	recorder := httptest.NewRecorder()
 
 	router.ServeHTTP(recorder, request)
@@ -24,10 +27,10 @@ func TestRouter(t *testing.T) {
 
 	body, _ := io.ReadAll(response.Body)
 
-	assert.Equal(t, "Hello Get", string(body))
+	assert.Equal(t, "Hello HttpRouter", string(body))
 	/*
-		=== RUN   TestRouter
-		--- PASS: TestRouter (0.00s)
+		=== RUN   TestServerFile
+		--- PASS: TestServerFile (0.04s)
 		PASS
 	*/
 }

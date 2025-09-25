@@ -10,9 +10,14 @@ import (
 	"testing"
 )
 
-func TestRouter(t *testing.T) {
+func TestMethodNotAllowedHandler(t *testing.T) {
 	router := httprouter.New()
-	router.GET("/", func(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+
+	router.MethodNotAllowed = http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		fmt.Fprint(w, "Gak Boleh")
+	})
+
+	router.POST("/", func(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 		fmt.Fprint(writer, "Hello Get")
 	})
 
@@ -24,10 +29,10 @@ func TestRouter(t *testing.T) {
 
 	body, _ := io.ReadAll(response.Body)
 
-	assert.Equal(t, "Hello Get", string(body))
+	assert.Equal(t, "Gak Boleh", string(body))
 	/*
-		=== RUN   TestRouter
-		--- PASS: TestRouter (0.00s)
+		=== RUN   TestMethodNotAllowedHandler
+		--- PASS: TestMethodNotAllowedHandler (0.00s)
 		PASS
 	*/
 }

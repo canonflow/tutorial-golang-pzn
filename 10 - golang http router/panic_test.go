@@ -10,10 +10,14 @@ import (
 	"testing"
 )
 
-func TestRouter(t *testing.T) {
+func TestPanicHandler(t *testing.T) {
 	router := httprouter.New()
+
+	router.PanicHandler = func(writer http.ResponseWriter, request *http.Request, error interface{}) {
+		fmt.Fprint(writer, "Panic: ", error)
+	}
 	router.GET("/", func(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-		fmt.Fprint(writer, "Hello Get")
+		panic("Upps...")
 	})
 
 	request := httptest.NewRequest(http.MethodGet, "/", nil)
@@ -24,10 +28,10 @@ func TestRouter(t *testing.T) {
 
 	body, _ := io.ReadAll(response.Body)
 
-	assert.Equal(t, "Hello Get", string(body))
+	assert.Equal(t, "Panic: Upps...", string(body))
 	/*
-		=== RUN   TestRouter
-		--- PASS: TestRouter (0.00s)
+		=== RUN   TestPanicHandler
+		--- PASS: TestPanicHandler (0.00s)
 		PASS
 	*/
 }
