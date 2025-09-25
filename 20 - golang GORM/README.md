@@ -2081,3 +2081,39 @@ sqlDB.SetMaxIdleConns(10)
 sqlDB.SetConnMaxLifetime(30 * time.Minute)
 sqlDB.SetConnMaxIdleTime(5 * time.Minute)
 ```
+
+---
+
+## Migrator
+
+- Sebelumnya, kita pernah belajar tentang Database migration di kelas [Golang Database Migration](https://github.com/canonflow/tutorial-golang-pzn/tree/main/16%20-%20golang%20database%20migration).
+- Sebenarnya GORM sendiri memiliki fitur untuk melakukan **Migration secara otomatis**.
+- Namun **lebih direkomendasikan** menggunakan database migration **yang mendukung version** agar tidak terjadi kesalahan ketika melakukan perubahan schema database.
+- [https://pkg.go.dev/gorm.io/gorm#Migrator](https://pkg.go.dev/gorm.io/gorm#Migrator).
+- Kita tidak akan membahas terlalu panjang fitur Migrator ini, karena jarang sekali digunakan di aplikasi nyata, biasanya hanya digunakan untuk melakukan pengetesan di komputer programmer saja
+
+### Kode: GuestBook Model
+
+```go
+type GuestBook struct {
+	ID        int64  `gorm:"primaryKey;column:id;autoIncrement"`
+	Name      string `gorm:"column:name"`
+	Email     string `gorm:"column:email"`
+	Message   string `gorm:"column:message"`
+	CreatedAt string `gorm:"column:created_at;autoCreateTime"`
+	UpdatedAt string `gorm:"column:updated_at;autoCreateTime;autoUpdateTime"`
+}
+
+func (g *GuestBook) TableName() string {
+	return "guest_books"
+}
+```
+
+### Kode: Migrator
+
+```go
+func TestMigrator(t *testing.T) {
+    err := db.Migrator().AutoMigrate(&GuestBook{})
+    assert.Nil(t, err)
+}
+```
