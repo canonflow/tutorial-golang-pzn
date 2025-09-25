@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"testing"
 	"time"
 
@@ -267,6 +268,46 @@ func TestGetStream(t *testing.T) {
 	/*
 		=== RUN   TestGetStream
 		--- PASS: TestGetStream (0.01s)
+		PASS
+	*/
+}
+
+func TestSubscribePubSub(t *testing.T) {
+	subscriber := client.Subscribe(ctx, "channel-1")
+	defer subscriber.Close()
+
+	for i := 0; i < 10; i++ {
+		message, err := subscriber.ReceiveMessage(ctx)
+
+		assert.Nil(t, err)
+		fmt.Println(message.Payload)
+	}
+
+	/*
+		=== RUN   TestSubscribePubSub
+		Hello 0
+		Hello 1
+		Hello 2
+		Hello 3
+		Hello 4
+		Hello 5
+		Hello 6
+		Hello 7
+		Hello 8
+		Hello 9
+		--- PASS: TestSubscribePubSub (3.19s)
+		PASS
+	*/
+}
+
+func TestPublishPubSub(t *testing.T) {
+	for i := 0; i < 10; i++ {
+		client.Publish(ctx, "channel-1", "Hello "+strconv.Itoa(i))
+	}
+
+	/*
+		=== RUN   TestPublishPubSub
+		--- PASS: TestPublishPubSub (0.02s)
 		PASS
 	*/
 }

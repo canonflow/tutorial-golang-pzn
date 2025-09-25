@@ -331,3 +331,34 @@ func TestGetStream(t *testing.T) {
     }
 }
 ```
+
+---
+
+## Pub Sub
+
+- Yang terakhir, kita dapat menggunakan fitur **Pub Sub** menggunakan Golang Redis.
+
+### Kode: Subscribe PubSub
+
+```go
+func TestSubscribePubSub(t *testing.T) {
+    subscriber := client.Subscribe(ctx, "channel-1")
+
+    for i := 0; i < 10; i++ {
+        message, _ := subscriber.ReceiveMessage(ctx)
+        fmt.Println(message.Payload)
+    }
+
+    subscriber.Close()
+}
+```
+
+### Kode: Publish PubSub
+
+```go
+func TestPublishPubSub(t *testing.T) {
+    for i := 0; i < 10; i++ {
+        client.Publish(ctx, "channel-1", "Hello " + strconv.Itoa(i))
+    }
+}
+```
